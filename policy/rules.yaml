@@ -1,0 +1,74 @@
+# SoloOS Policy Rules v0.1
+# Order matters: first match wins.
+# Verdicts: auto | approval | deny | escalate
+
+version: 1
+default_verdict: approval  # unknown → require CEO approval (safe)
+
+rules:
+  # ─── DENY (immutable no-go) ──────────────────────────
+  - id: no_public_secrets
+    when: "action.contains_secret == True"
+    verdict: deny
+    reason: "Secrets never leave the vault"
+
+  - id: no_prod_delete
+    when: "action.type == 'delete' and target.env == 'production'"
+    verdict: deny
+
+  # ─── ESCALATE ────────────────────────────────────────
+  - id: cmo_overbudget
+    when: "actor == 'agent:cmo' and action.type == 'spend_money' and params.amount_krw > 500000"
+    verdict: escalate
+    to: agent:finance
+    reason: "Marketing spend over 500k → Finance review first"
+
+  # ─── APPROVAL (default for risk classes) ─────────────
+  - id: money_out
+    when: "action.type in ['payment','subscription','ads_spend','refund','spend_money']"
+    verdict: approval
+    risk: HIGH
+    template: money_out.md.j2
+
+  - id: external_message
+    when: "action.type == 'send_email' and audience == 'external'"
+    verdict: approval
+    exempt_if: "template.id in ['auto_receipt','followup_v1','onboarding_step1']"
+    risk: MED
+
+  - id: content_publish
+    when: "action.type == 'publish' and channel in ['blog','x','linkedin','youtube']"
+    verdict: approval
+    risk: MED
+    template: content_publish.md.j2
+
+  - id: contract_send
+    when: "action.type == 'send_contract'"
+    verdict: approval
+    risk: HIGH
+
+  - id: hire_or_fire
+    when: "action.type in ['hire_vendor','fire_vendor','change_contractor']"
+    verdict: approval
+    risk: HIGH
+
+  # ─── AUTO (safe internal ops) ────────────────────────
+  - id: internal_drafts
+    when: "action.type in ['draft_content','summarize','translate','extract']"
+    verdict: auto
+    risk: LOW
+
+  - id: internal_ops
+    when: "action.type in ['task_create','reminder','note_update','tag_lead','update_crm']"
+    verdict: auto
+    risk: LOW
+
+  - id: read_only
+    when: "action.type in ['search','recall','fetch','list','report']"
+    verdict: auto
+    risk: LOW
+
+  - id: internal_notify
+    when: "action.type == 'send_message' and audience == 'ceo'"
+    verdict: auto
+    risk: LOW
