@@ -19,6 +19,7 @@ from .config import get_config
 from .db import connect
 from .db import migrate as run_migrations
 from .mission_control import decide_approval, submit_ceo_request
+from .mission_control_snapshot import export_snapshot
 from .policy import PolicyEngine
 from .workflow import WorkflowService
 
@@ -169,6 +170,18 @@ def deck_dispatch(text: str, platform: str, chat_id: str, thread_id: str | None)
 @main.group(name="mission-control")
 def mission_control_group() -> None:
     """CEO Mission Control operations."""
+
+
+@mission_control_group.command("export-snapshot")
+@click.option("--output", "output_path", type=click.Path(path_type=str), default="apps/web/public/soloos-snapshot.json")
+@click.option("--limit", default=50, type=int)
+def mission_control_export_snapshot(output_path: str, limit: int) -> None:
+    """Export the current runtime snapshot for the web dashboard."""
+    snapshot = export_snapshot(out_path=Path(output_path), limit=limit)
+    console.print(
+        f"snapshot={output_path} agents={snapshot['counts'].get('agents', 0)} "
+        f"actions={snapshot['counts'].get('actions', 0)} approvals={snapshot['counts'].get('approvals', 0)}"
+    )
 
 
 @mission_control_group.command("ask")
