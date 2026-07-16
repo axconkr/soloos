@@ -18,6 +18,7 @@ type FactoryResult = {
   agent_id?: string;
   approval_id?: string;
   policy_status?: string;
+  slug?: string;
   error?: string;
 };
 
@@ -117,7 +118,7 @@ export default function AgentFactoryPage() {
             {
               id: data.instance_id,
               agent_id: data.agent_id,
-              slug: form.slug,
+              slug: data.slug || form.slug,
               mission: form.mission,
               lifecycle_status: data.lifecycle_status || "draft",
               policy_status: data.policy_status || "review_required",
@@ -195,6 +196,7 @@ export default function AgentFactoryPage() {
           <span>Factory API result</span>
           <strong>{factoryResult?.status ?? "대기 중"}</strong>
           <p>instance_id: {(factoryResult?.instance_id ?? currentInstanceId) || "-"}</p>
+          <p>slug: {factoryResult?.slug ?? text(latestInstance?.slug, "-")}</p>
           <p>approval_id: {factoryResult?.approval_id ?? "-"}</p>
           <p>policy: {factoryResult?.policy_status ?? "draft → review_required → approval_required"}</p>
           {factoryResult?.error ? <p>error: {factoryResult.error}</p> : null}

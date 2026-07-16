@@ -199,6 +199,32 @@ export type AgentFactoryDraftInput = {
   createdBy: string;
 };
 
+function templateIdFor(input: AgentFactoryDraftInput, slug: string) {
+  return `web-${input.department.replace(/^agent:/, "").replace(/[^a-zA-Z0-9_-]/g, "-")}-${slug}`.toLowerCase();
+}
+
+function isDuplicateAgentInstanceError(error: unknown) {
+  const text = error instanceof Error ? `${error.message} ${(error as Error & { stderr?: string; stdout?: string }).stderr ?? ""} ${(error as Error & { stderr?: string; stdout?: string }).stdout ?? ""}` : String(error);
+  return text.includes("UNIQUE constraint failed: agent_instances.id")
+    || text.includes("UNIQUE constraint failed: agent_instances.slug")
+    || text.includes("agent_instances.id")
+    || text.includes("agent_instances.slug");
+}
+
+async function createLocalAgentInstance(input: AgentFactoryDraftInput, templateId: string, slug: string) {
+  return runFile(
+    "uv",
+    [
+      "run", "soloos", "agent-factory", "create", templateId,
+      "--owner-agent", input.department,
+      "--slug", slug,
+      "--var", `objective=${input.roleName}`,
+      "--created-by", input.createdBy,
+    ],
+    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
+  );
+}
+
 export async function createAgentFactoryDraft(input: AgentFactoryDraftInput, baseEvent: MissionControlEvent) {
   if (SOLOOS_API_URL) {
     const remote = await postRemote("/agent-factory/create", input as unknown as MissionControlEvent);
@@ -209,47 +235,60 @@ export async function createAgentFactoryDraft(input: AgentFactoryDraftInput, bas
   }
   await ensureLocalMigrations();
 
-  const templateId = `web-${input.department.replace(/^agent:/, "").replace(/[^a-zA-Z0-9_-]/g, "-")}-${input.slug}`.toLowerCase();
+  let effectiveSlug = input.slug;
+  let templateId = templateIdFor(input, effectiveSlug);
   const authority = JSON.stringify({ guardrail: input.authority, external_contact: false, production: false });
   const kpi = JSON.stringify({ primary: input.kpi || "agent_quality", review_required: true });
   const missionTemplate = `${input.mission} {{objective}}`;
 
-  await runFile(
-    "uv",
-    [
-      "run", "soloos", "agent-factory", "create-template", templateId,
-      "--name", input.roleName,
-      "--department", input.department,
-      "--mission-template", missionTemplate,
-      "--authority", authority,
-      "--kpi", kpi,
-      "--risk-tier", input.riskTier,
-      ...input.skills.flatMap((skill) => ["--skill", skill]),
-    ],
-    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
-  );
-  const { stdout, stderr } = await runFile(
-    "uv",
-    [
-      "run", "soloos", "agent-factory", "create", templateId,
-      "--owner-agent", input.department,
-      "--slug", input.slug,
-      "--var", `objective=${input.roleName}`,
-      "--created-by", input.createdBy,
-    ],
-    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
-  );
+  async function upsertTemplate(id: string) {
+    await runFile(
+      "uv",
+      [
+        "run", "soloos", "agent-factory", "create-template", id,
+        "--name", input.roleName,
+        "--department", input.department,
+        "--mission-template", missionTemplate,
+        "--authority", authority,
+        "--kpi", kpi,
+        "--risk-tier", input.riskTier,
+        ...input.skills.flatMap((skill) => ["--skill", skill]),
+      ],
+      { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
+    );
+  }
+
+  await upsertTemplate(templateId);
+  let stdout = "";
+  let stderr = "";
+  try {
+    const result = await createLocalAgentInstance(input, templateId, effectiveSlug);
+    stdout = result.stdout;
+    stderr = result.stderr;
+  } catch (error) {
+    if (!isDuplicateAgentInstanceError(error)) throw error;
+    // Web forms are often re-submitted with the same draft slug. Keep the user's
+    // base slug readable but make the concrete AgentInstance unique instead of
+    // surfacing a 502 from SQLite.
+    effectiveSlug = `${input.slug}-${Date.now().toString(36).slice(-6)}`;
+    templateId = templateIdFor(input, effectiveSlug);
+    await upsertTemplate(templateId);
+    const retry = await createLocalAgentInstance(input, templateId, effectiveSlug);
+    stdout = retry.stdout;
+    stderr = retry.stderr;
+  }
   await runFile("uv", ["run", "soloos", "mission-control", "export-snapshot", "--output", SNAPSHOT_PATH], { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 });
   return {
     ...baseEvent,
     template_id: templateId,
+    slug: effectiveSlug,
     instance_id: stdout.match(/instance=([^\s]+)/)?.[1],
     agent_id: stdout.match(/agent=([^\s]+)/)?.[1],
     policy_status: stdout.match(/policy=([^\s]+)/)?.[1],
     lifecycle_status: stdout.match(/status=([^\s]+)/)?.[1],
     snapshot_path: "soloos-snapshot.json",
     local_warning: stderr.trim() ? "soloos_cli_wrote_stderr" : undefined,
-    status: "agent_factory_draft_created",
+    status: effectiveSlug === input.slug ? "agent_factory_draft_created" : "agent_factory_draft_created_with_unique_slug",
   };
 }
 

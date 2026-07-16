@@ -113,6 +113,7 @@ const expectations = [
   ['agent factory client invokes CLI create-template', missionClient, 'create-template'],
   ['agent factory client applies migrations before local CLI', missionClient, 'db", "migrate'],
   ['agent factory client invokes CLI request-activation', missionClient, 'request-activation'],
+  ['agent factory client retries duplicate slug', missionClient, 'agent_factory_draft_created_with_unique_slug'],
   ['mission client keeps fallback command JSONL', missionClient, 'web-commands.jsonl'],
   ['mission client keeps fallback approval JSONL', missionClient, 'web-approvals.jsonl'],
   ['mission client invokes child process locally', missionClient, 'execFile'],
