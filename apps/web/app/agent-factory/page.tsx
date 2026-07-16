@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 type RuntimeRow = Record<string, string | number | boolean | null | object | unknown[]>;
@@ -10,6 +10,15 @@ type Snapshot = {
   agent_templates?: RuntimeRow[];
   agent_instances?: RuntimeRow[];
   approvals?: RuntimeRow[];
+};
+
+type FactoryResult = {
+  status?: string;
+  instance_id?: string;
+  agent_id?: string;
+  approval_id?: string;
+  policy_status?: string;
+  error?: string;
 };
 
 function text(value: unknown, fallback = "-") {
@@ -42,9 +51,24 @@ const blueprintCards = [
   },
 ];
 
+const initialForm = {
+  role_name: "고객 문의 1차 분류 에이전트",
+  department: "agent:growth",
+  slug: "customer-inquiry-triage",
+  mission: "신규 고객 문의를 의도/긴급도/다음 액션 기준으로 분류하고 담당 부서에 전달합니다.",
+  skills: "inbox_triage, korean_response_draft",
+  authority: "고객에게 직접 발송 금지, 개인정보 저장 금지, CEO 승인 전 프로덕션 자동화 금지",
+  kpi: "first_response_time, routing_accuracy",
+  risk_tier: "MED",
+  created_by: "employee:web",
+};
+
 export default function AgentFactoryPage() {
   const [snapshot, setSnapshot] = useState<Snapshot | null>(null);
   const [snapshotState, setSnapshotState] = useState("snapshot loading");
+  const [form, setForm] = useState(initialForm);
+  const [factoryResult, setFactoryResult] = useState<FactoryResult | null>(null);
+  const [factoryBusy, setFactoryBusy] = useState(false);
 
   useEffect(() => {
     let active = true;
@@ -69,6 +93,45 @@ export default function AgentFactoryPage() {
   const approvals = useMemo(() => snapshot?.approvals ?? [], [snapshot]);
   const pendingInstances = instances.filter((instance) => text(instance.policy_status).includes("approval"));
   const latestInstance = instances[0];
+  const currentInstanceId = factoryResult?.instance_id || text(latestInstance?.id, "");
+
+  async function submitFactory(mode: "create_draft" | "request_approval", event?: FormEvent) {
+    event?.preventDefault();
+    setFactoryBusy(true);
+    setFactoryResult(null);
+    try {
+      const payload = mode === "create_draft"
+        ? { mode, ...form }
+        : { mode, instance_id: currentInstanceId, requested_by: form.created_by };
+      const response = await fetch("/api/agent-factory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await response.json();
+      setFactoryResult(data);
+      if (data.instance_id) {
+        setSnapshot((prev) => ({
+          ...(prev ?? {}),
+          agent_instances: [
+            {
+              id: data.instance_id,
+              agent_id: data.agent_id,
+              slug: form.slug,
+              mission: form.mission,
+              lifecycle_status: data.lifecycle_status || "draft",
+              policy_status: data.policy_status || "review_required",
+            },
+            ...((prev?.agent_instances ?? []).filter((row) => row.id !== data.instance_id)),
+          ],
+        }));
+      }
+    } catch (error) {
+      setFactoryResult({ status: "agent_factory_failed", error: error instanceof Error ? error.message : "unknown_error" });
+    } finally {
+      setFactoryBusy(false);
+    }
+  }
 
   return (
     <main className="factory-shell">
@@ -90,6 +153,52 @@ export default function AgentFactoryPage() {
         <div><span>Instances</span><strong>{Number(snapshot?.counts?.agent_instances ?? instances.length)}</strong></div>
         <div><span>Approval Gate</span><strong>{pendingInstances.length}</strong></div>
         <div><span>Snapshot</span><strong>{snapshotState}</strong></div>
+      </section>
+
+      <section className="employee-builder" aria-label="직원이 에이전트 만들기">
+        <div>
+          <p className="factory-kicker">직원이 에이전트 만들기</p>
+          <h2>AgentSpec을 작성하고 draft instance를 생성합니다.</h2>
+          <p>아래 폼은 단순 대시보드가 아니라 `/api/agent-factory`를 호출해 실제 SoloOS Agent Factory CLI에 draft를 만들고, 이어서 대표 승인 요청까지 연결합니다.</p>
+        </div>
+        <form className="agent-builder-form" onSubmit={(event) => submitFactory("create_draft", event)}>
+          <label>역할 / 이름<input value={form.role_name} onChange={(event) => setForm({ ...form, role_name: event.target.value })} /></label>
+          <label>담당 부서
+            <select value={form.department} onChange={(event) => setForm({ ...form, department: event.target.value })}>
+              <option value="agent:growth">Growth</option>
+              <option value="agent:cto">CTO</option>
+              <option value="agent:design">Design</option>
+              <option value="agent:ops">Ops</option>
+              <option value="agent:cfo">CFO</option>
+              <option value="agent:general_counsel">Legal</option>
+              <option value="agent:ceo_office">CEO Office</option>
+            </select>
+          </label>
+          <label>Slug<input value={form.slug} onChange={(event) => setForm({ ...form, slug: event.target.value })} /></label>
+          <label className="wide">미션<textarea value={form.mission} onChange={(event) => setForm({ ...form, mission: event.target.value })} /></label>
+          <label className="wide">권한 제한<textarea value={form.authority} onChange={(event) => setForm({ ...form, authority: event.target.value })} /></label>
+          <label>도구/스킬<input value={form.skills} onChange={(event) => setForm({ ...form, skills: event.target.value })} /></label>
+          <label>KPI<input value={form.kpi} onChange={(event) => setForm({ ...form, kpi: event.target.value })} /></label>
+          <label>Risk
+            <select value={form.risk_tier} onChange={(event) => setForm({ ...form, risk_tier: event.target.value })}>
+              <option value="LOW">LOW</option>
+              <option value="MED">MED</option>
+              <option value="HIGH">HIGH</option>
+            </select>
+          </label>
+          <div className="factory-actions wide">
+            <button type="submit" disabled={factoryBusy}>{factoryBusy ? "생성 중…" : "Agent draft 생성"}</button>
+            <button type="button" disabled={factoryBusy || !currentInstanceId} onClick={() => submitFactory("request_approval")}>대표 승인 요청</button>
+          </div>
+        </form>
+        <aside className="factory-result" aria-live="polite">
+          <span>Factory API result</span>
+          <strong>{factoryResult?.status ?? "대기 중"}</strong>
+          <p>instance_id: {(factoryResult?.instance_id ?? currentInstanceId) || "-"}</p>
+          <p>approval_id: {factoryResult?.approval_id ?? "-"}</p>
+          <p>policy: {factoryResult?.policy_status ?? "draft → review_required → approval_required"}</p>
+          {factoryResult?.error ? <p>error: {factoryResult.error}</p> : null}
+        </aside>
       </section>
 
       <section className="factory-lanes" aria-label="Agent creation lanes">

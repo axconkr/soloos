@@ -7,6 +7,7 @@ const requiredFiles = [
   'app/agent-factory/page.tsx',
   'app/agent-factory/layout.tsx',
   'app/globals.css',
+  'app/api/agent-factory/route.ts',
   'app/api/company-command/route.ts',
   'app/api/approval-decision/route.ts',
   'lib/mission-control-data.ts',
@@ -30,6 +31,7 @@ const layout = readFileSync(join(root, 'app/layout.tsx'), 'utf8');
 const css = readFileSync(join(root, 'app/globals.css'), 'utf8');
 const data = readFileSync(join(root, 'lib/mission-control-data.ts'), 'utf8');
 const commandRoute = readFileSync(join(root, 'app/api/company-command/route.ts'), 'utf8');
+const agentFactoryRoute = readFileSync(join(root, 'app/api/agent-factory/route.ts'), 'utf8');
 const approvalRoute = readFileSync(join(root, 'app/api/approval-decision/route.ts'), 'utf8');
 const missionClient = readFileSync(join(root, 'lib/mission-control-client.ts'), 'utf8');
 const apiGuard = readFileSync(join(root, 'lib/api-guard.ts'), 'utf8');
@@ -105,6 +107,12 @@ const expectations = [
   ['approval route uses bounded JSON parser', approvalRoute, 'readBoundedJson'],
   ['approval route writes real decision status', missionClient, 'recorded_in_soloos'],
   ['approval route decisions', missionClient, 'approve'],
+  ['agent factory route creates draft', agentFactoryRoute, 'createAgentFactoryDraft'],
+  ['agent factory route requests approval', agentFactoryRoute, 'requestAgentFactoryApproval'],
+  ['agent factory route validates mode', agentFactoryRoute, 'invalid_factory_mode'],
+  ['agent factory client invokes CLI create-template', missionClient, 'create-template'],
+  ['agent factory client applies migrations before local CLI', missionClient, 'db", "migrate'],
+  ['agent factory client invokes CLI request-activation', missionClient, 'request-activation'],
   ['mission client keeps fallback command JSONL', missionClient, 'web-commands.jsonl'],
   ['mission client keeps fallback approval JSONL', missionClient, 'web-approvals.jsonl'],
   ['mission client invokes child process locally', missionClient, 'execFile'],
@@ -138,6 +146,13 @@ const expectations = [
   ['separate factory page title', factoryPage, 'AX Agent Factory'],
   ['separate factory page not mission control', factoryPage, '이 화면은 Mission Control이 아닙니다'],
   ['factory build lane', factoryPage, 'Build Lane'],
+  ['factory employee create form', factoryPage, '직원이 에이전트 만들기'],
+  ['factory role input', factoryPage, '역할 / 이름'],
+  ['factory mission input', factoryPage, '미션'],
+  ['factory authority input', factoryPage, '권한 제한'],
+  ['factory create api call', factoryPage, '/api/agent-factory'],
+  ['factory request approval button', factoryPage, '대표 승인 요청'],
+  ['factory approval id feedback', factoryPage, 'approval_id'],
   ['factory governance gate lane', factoryPage, 'Governance Gate'],
   ['factory launch rail', factoryPage, 'Launch Rail'],
   ['factory agent spec phrase', factoryPage, 'AgentSpec 설계'],

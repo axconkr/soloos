@@ -1,18 +1,26 @@
 import { execFile } from "node:child_process";
+import { existsSync } from "node:fs";
 import { appendFile, mkdir } from "node:fs/promises";
 import { dirname, resolve } from "node:path";
 import { promisify } from "node:util";
 
 const runFile = promisify(execFile);
 
-export const REPO_ROOT = resolve(process.cwd(), "../..");
-export const SNAPSHOT_PATH = resolve(process.cwd(), "public/soloos-snapshot.json");
+function resolveRepoRoot() {
+  const cwd = process.cwd();
+  if (existsSync(resolve(cwd, "pyproject.toml")) && existsSync(resolve(cwd, "src/soloos"))) return cwd;
+  return resolve(cwd, "../..");
+}
+
+export const REPO_ROOT = resolveRepoRoot();
+export const WEB_ROOT = existsSync(resolve(process.cwd(), "app")) ? process.cwd() : resolve(REPO_ROOT, "apps/web");
+export const SNAPSHOT_PATH = resolve(WEB_ROOT, "public/soloos-snapshot.json");
 export const COMMAND_LOG = resolve(REPO_ROOT, "data/web-commands.jsonl");
 export const APPROVAL_LOG = resolve(REPO_ROOT, "data/web-approvals.jsonl");
 
 const SOLOOS_API_URL = process.env.SOLOOS_MISSION_CONTROL_URL?.replace(/\/$/, "");
 const SOLOOS_API_TOKEN = process.env.SOLOOS_MISSION_CONTROL_TOKEN;
-const IS_SERVERLESS = process.env.VERCEL === "1"
+export const IS_SERVERLESS = process.env.VERCEL === "1"
   || process.env.NETLIFY === "true"
   || Boolean(process.env.AWS_LAMBDA_FUNCTION_NAME)
   || Boolean(process.env.CF_PAGES)
@@ -57,6 +65,11 @@ async function appendJsonl(path: string, event: MissionControlEvent) {
   await appendFile(path, `${JSON.stringify(event)}\n`, "utf8");
 }
 
+async function ensureLocalMigrations() {
+  if (IS_SERVERLESS || SOLOOS_API_URL) return;
+  await runFile("uv", ["run", "soloos", "db", "migrate"], { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 });
+}
+
 async function postRemote(path: string, body: MissionControlEvent) {
   if (!SOLOOS_API_URL) {
     throw new MissionControlUnavailableError(
@@ -93,6 +106,7 @@ export async function askMissionControl(command: string, source: string, baseEve
   if (IS_SERVERLESS) {
     throw new MissionControlUnavailableError("local uv execution is disabled in serverless; configure SOLOOS_MISSION_CONTROL_URL");
   }
+  await ensureLocalMigrations();
 
   const { stdout, stderr } = await runFile(
     "uv",
@@ -135,6 +149,7 @@ export async function decideMissionControl(
   if (IS_SERVERLESS) {
     throw new MissionControlUnavailableError("local uv execution is disabled in serverless; configure SOLOOS_MISSION_CONTROL_URL");
   }
+  await ensureLocalMigrations();
 
   const { stdout, stderr } = await runFile(
     "uv",
@@ -170,4 +185,98 @@ export async function recordCommandEvent(event: MissionControlEvent) {
 
 export async function recordApprovalEvent(event: MissionControlEvent) {
   await appendJsonl(APPROVAL_LOG, event);
+}
+
+export type AgentFactoryDraftInput = {
+  roleName: string;
+  department: string;
+  slug: string;
+  mission: string;
+  skills: string[];
+  authority: string;
+  kpi: string;
+  riskTier: "LOW" | "MED" | "HIGH";
+  createdBy: string;
+};
+
+export async function createAgentFactoryDraft(input: AgentFactoryDraftInput, baseEvent: MissionControlEvent) {
+  if (SOLOOS_API_URL) {
+    const remote = await postRemote("/agent-factory/create", input as unknown as MissionControlEvent);
+    return { ...baseEvent, ...remote, status: "agent_factory_created_remote" };
+  }
+  if (IS_SERVERLESS) {
+    throw new MissionControlUnavailableError("local uv execution is disabled in serverless; configure SOLOOS_MISSION_CONTROL_URL");
+  }
+  await ensureLocalMigrations();
+
+  const templateId = `web-${input.department.replace(/^agent:/, "").replace(/[^a-zA-Z0-9_-]/g, "-")}-${input.slug}`.toLowerCase();
+  const authority = JSON.stringify({ guardrail: input.authority, external_contact: false, production: false });
+  const kpi = JSON.stringify({ primary: input.kpi || "agent_quality", review_required: true });
+  const missionTemplate = `${input.mission} {{objective}}`;
+
+  await runFile(
+    "uv",
+    [
+      "run", "soloos", "agent-factory", "create-template", templateId,
+      "--name", input.roleName,
+      "--department", input.department,
+      "--mission-template", missionTemplate,
+      "--authority", authority,
+      "--kpi", kpi,
+      "--risk-tier", input.riskTier,
+      ...input.skills.flatMap((skill) => ["--skill", skill]),
+    ],
+    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
+  );
+  const { stdout, stderr } = await runFile(
+    "uv",
+    [
+      "run", "soloos", "agent-factory", "create", templateId,
+      "--owner-agent", input.department,
+      "--slug", input.slug,
+      "--var", `objective=${input.roleName}`,
+      "--created-by", input.createdBy,
+    ],
+    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
+  );
+  await runFile("uv", ["run", "soloos", "mission-control", "export-snapshot", "--output", SNAPSHOT_PATH], { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 });
+  return {
+    ...baseEvent,
+    template_id: templateId,
+    instance_id: stdout.match(/instance=([^\s]+)/)?.[1],
+    agent_id: stdout.match(/agent=([^\s]+)/)?.[1],
+    policy_status: stdout.match(/policy=([^\s]+)/)?.[1],
+    lifecycle_status: stdout.match(/status=([^\s]+)/)?.[1],
+    snapshot_path: "soloos-snapshot.json",
+    local_warning: stderr.trim() ? "soloos_cli_wrote_stderr" : undefined,
+    status: "agent_factory_draft_created",
+  };
+}
+
+export async function requestAgentFactoryApproval(instanceId: string, requestedBy: string, baseEvent: MissionControlEvent) {
+  if (SOLOOS_API_URL) {
+    const remote = await postRemote("/agent-factory/request-activation", { instance_id: instanceId, requested_by: requestedBy });
+    return { ...baseEvent, ...remote, status: "agent_factory_approval_requested_remote" };
+  }
+  if (IS_SERVERLESS) {
+    throw new MissionControlUnavailableError("local uv execution is disabled in serverless; configure SOLOOS_MISSION_CONTROL_URL");
+  }
+  await ensureLocalMigrations();
+
+  const { stdout, stderr } = await runFile(
+    "uv",
+    ["run", "soloos", "agent-factory", "request-activation", instanceId, "--requested-by", requestedBy],
+    { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 },
+  );
+  await runFile("uv", ["run", "soloos", "mission-control", "export-snapshot", "--output", SNAPSHOT_PATH], { cwd: REPO_ROOT, timeout: 30_000, maxBuffer: 1024 * 1024 });
+  return {
+    ...baseEvent,
+    instance_id: stdout.match(/instance=([^\s]+)/)?.[1] ?? instanceId,
+    approval_id: stdout.match(/approval=([^\s]+)/)?.[1],
+    policy_status: stdout.match(/policy=([^\s]+)/)?.[1],
+    risk: stdout.match(/risk=([^\s]+)/)?.[1],
+    snapshot_path: "soloos-snapshot.json",
+    local_warning: stderr.trim() ? "soloos_cli_wrote_stderr" : undefined,
+    status: "agent_factory_approval_requested",
+  };
 }
