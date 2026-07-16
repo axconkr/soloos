@@ -4,6 +4,8 @@ import { join } from 'node:path';
 const root = new URL('..', import.meta.url).pathname;
 const requiredFiles = [
   'app/page.tsx',
+  'app/agent-factory/page.tsx',
+  'app/agent-factory/layout.tsx',
   'app/globals.css',
   'app/api/company-command/route.ts',
   'app/api/approval-decision/route.ts',
@@ -22,6 +24,8 @@ for (const file of requiredFiles) {
 }
 
 const page = readFileSync(join(root, 'app/page.tsx'), 'utf8');
+const factoryPage = readFileSync(join(root, 'app/agent-factory/page.tsx'), 'utf8');
+const factoryLayout = readFileSync(join(root, 'app/agent-factory/layout.tsx'), 'utf8');
 const layout = readFileSync(join(root, 'app/layout.tsx'), 'utf8');
 const css = readFileSync(join(root, 'app/globals.css'), 'utf8');
 const data = readFileSync(join(root, 'lib/mission-control-data.ts'), 'utf8');
@@ -60,6 +64,7 @@ const expectations = [
   ['department button affordance', page, '부서 상세 열기'],
   ['agent factory workbench', page, 'Agent Factory / Employee Workbench'],
   ['agent factory Korean substrate', page, '직원이 필요한 에이전트를 만들고'],
+  ['agent factory separate route link', page, '/agent-factory'],
   ['agent template snapshot use', page, 'agent_templates'],
   ['agent instance snapshot use', page, 'agent_instances'],
   ['factory review required state', page, 'approval_required'],
@@ -130,7 +135,20 @@ const expectations = [
   ['deployment readiness command docs', webDeployment, 'soloos mission-control deploy-readiness'],
   ['deployment production guard docs', webDeployment, 'production_deploy=blocked_until_ceo_approval'],
   ['README branding blocker', readme, 'TODO: brand asset required'],
+  ['separate factory page title', factoryPage, 'AX Agent Factory'],
+  ['separate factory page not mission control', factoryPage, '이 화면은 Mission Control이 아닙니다'],
+  ['factory build lane', factoryPage, 'Build Lane'],
+  ['factory governance gate lane', factoryPage, 'Governance Gate'],
+  ['factory launch rail', factoryPage, 'Launch Rail'],
+  ['factory agent spec phrase', factoryPage, 'AgentSpec 설계'],
+  ['factory route uses snapshot', factoryPage, 'soloos-snapshot.json'],
+  ['factory page title metadata', factoryLayout, 'AX Agent Factory · SoloOS'],
+  ['factory page css', css, 'factory-shell'],
 ];
+
+if (factoryPage.includes('CEO Cockpit') || factoryPage.includes('오늘 회사가 어떻게 돌아가고 있나요?')) {
+  throw new Error('Agent Factory route must not reuse the Mission Control cockpit information architecture');
+}
 
 for (const [label, source, needle] of expectations) {
   if (!source.includes(needle)) {

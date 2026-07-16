@@ -427,7 +427,7 @@ export default function Home() {
               권한·KPI·위험도를 붙여 검토 요청하는 SoloOS의 밑바닥입니다.
             </p>
           </div>
-          <span className="map-badge">templates {Number(counts.agent_templates ?? templates.length)} · instances {Number(counts.agent_instances ?? factoryInstances.length)}</span>
+          <a className="map-badge factory-route-link" href="/agent-factory">별도 Factory 화면 열기 → /agent-factory</a>
         </div>
         <div className="factory-grid">
           <article>

@@ -162,6 +162,8 @@ h1 { margin: 0; max-width: 900px; font-size: clamp(42px, 6vw, 82px); line-height
 .factory-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
 .factory-grid article { min-height: 150px; padding: 16px; border: 1px solid rgba(255,255,255,.08); border-radius: 18px; background: rgba(0,0,0,.18); }
 .factory-grid span { display: block; color: var(--muted); font-size: 12px; margin-bottom: 8px; }
+.factory-route-link { text-decoration: none; font-weight: 800; }
+.factory-route-link:hover { border-color: rgba(16,185,129,.5); color: #d1fae5; }
 .factory-grid strong { display: block; font-size: 18px; line-height: 1.25; overflow-wrap: anywhere; }
 .factory-grid p { margin: 8px 0 0; color: var(--soft); font-size: 13px; line-height: 1.45; }
 .detail-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 16px; }
@@ -196,3 +198,159 @@ h1 { margin: 0; max-width: 900px; font-size: clamp(42px, 6vw, 82px); line-height
   .status-card strong, .score-card strong { font-size: 34px; }
   .department-grid, .flow-line, .detail-metrics { grid-template-columns: 1fr; }
 }
+
+
+/* Agent Factory is intentionally a different workbench surface, not the CEO cockpit. */
+.factory-shell {
+  width: min(1320px, calc(100vw - 42px));
+  margin: 0 auto;
+  padding: 30px 0 58px;
+}
+.factory-hero {
+  min-height: 430px;
+  display: grid;
+  align-content: end;
+  padding: 28px;
+  border: 1px solid rgba(16, 185, 129, .24);
+  border-radius: 34px;
+  background:
+    linear-gradient(120deg, rgba(16,185,129,.2), transparent 44%),
+    radial-gradient(circle at 78% 8%, rgba(251,191,36,.18), transparent 28%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 1px, transparent 1px 92px),
+    linear-gradient(145deg, rgba(5,18,16,.92), rgba(10,11,17,.96));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.035), 0 30px 110px rgba(0,0,0,.38);
+}
+.factory-nav { position: absolute; left: -9999px; }
+.factory-hero { position: relative; }
+.factory-nav {
+  position: absolute;
+  inset: 24px 24px auto 24px;
+  left: 24px;
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  align-items: center;
+}
+.factory-nav a, .factory-nav span {
+  color: #d1fae5;
+  text-decoration: none;
+  border: 1px solid rgba(16,185,129,.26);
+  background: rgba(0,0,0,.24);
+  border-radius: 999px;
+  padding: 9px 13px;
+  font-size: 12px;
+  font-weight: 800;
+}
+.factory-nav span { color: #ffe8a3; border-color: rgba(251,191,36,.38); }
+.factory-kicker {
+  margin: 0 0 14px;
+  color: #34d399;
+  text-transform: uppercase;
+  letter-spacing: .16em;
+  font-size: 12px;
+  font-weight: 900;
+}
+.factory-hero h1 {
+  margin: 0;
+  max-width: 960px;
+  font-size: clamp(54px, 8vw, 118px);
+  line-height: .84;
+  letter-spacing: -0.085em;
+}
+.factory-subtitle {
+  max-width: 900px;
+  margin: 24px 0 0;
+  color: #d7fff1;
+  font-size: 21px;
+  line-height: 1.65;
+}
+.factory-command-strip {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1.4fr;
+  gap: 12px;
+  margin: 14px 0;
+}
+.factory-command-strip div {
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(255,255,255,.045);
+}
+.factory-command-strip span, .factory-lane > p, .factory-spec-card span, .launch-card span {
+  display: block;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: .12em;
+  font-size: 11px;
+  font-weight: 900;
+}
+.factory-command-strip strong {
+  display: block;
+  margin-top: 8px;
+  font-size: 28px;
+  letter-spacing: -0.05em;
+}
+.factory-lanes {
+  display: grid;
+  grid-template-columns: .95fr 1.1fr .95fr;
+  gap: 14px;
+  align-items: stretch;
+}
+.factory-lane {
+  min-height: 620px;
+  border: 1px solid rgba(255,255,255,.085);
+  border-radius: 28px;
+  padding: 22px;
+  background: rgba(255,255,255,.04);
+}
+.factory-lane h2 {
+  margin: 12px 0 20px;
+  font-size: clamp(28px, 3.2vw, 48px);
+  line-height: 1.02;
+  letter-spacing: -0.06em;
+}
+.build-lane { background: linear-gradient(180deg, rgba(16,185,129,.14), rgba(255,255,255,.035)); }
+.governance-lane { background: linear-gradient(180deg, rgba(251,191,36,.13), rgba(255,255,255,.035)); }
+.launch-lane { background: linear-gradient(180deg, rgba(139,140,255,.16), rgba(255,255,255,.035)); }
+.factory-blueprint-list, .factory-lane { display: grid; gap: 14px; }
+.factory-blueprint-list div, .factory-spec-card, .launch-card {
+  border: 1px solid rgba(255,255,255,.09);
+  border-radius: 22px;
+  padding: 18px;
+  background: rgba(0,0,0,.2);
+}
+.factory-blueprint-list span {
+  display: inline-grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  background: rgba(16,185,129,.18);
+  color: #d1fae5;
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 900;
+}
+.factory-blueprint-list strong, .factory-spec-card strong, .launch-card strong {
+  display: block;
+  margin: 12px 0 8px;
+  font-size: 22px;
+  line-height: 1.15;
+}
+.factory-blueprint-list p, .factory-spec-card p, .launch-card p {
+  margin: 0;
+  color: var(--soft);
+  line-height: 1.55;
+}
+.factory-spec-card.warning { border-color: rgba(251,191,36,.32); background: rgba(251,191,36,.08); }
+.launch-card.muted { opacity: .82; }
+
+@media (max-width: 1040px) {
+  .factory-command-strip, .factory-lanes { grid-template-columns: 1fr; }
+  .factory-lane { min-height: auto; }
+}
+@media (max-width: 700px) {
+  .factory-shell { width: min(100vw - 22px, 1320px); }
+  .factory-nav { position: static; display: grid; margin-bottom: 90px; }
+  .factory-hero { min-height: auto; }
+}
+
