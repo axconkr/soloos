@@ -1,4 +1,7 @@
-"""Runtime config loader (env + defaults)."""
+"""Runtime config loader (env + defaults).
+
+Tests and CLIs can call ``get_config(reload=True)`` after changing env vars.
+"""
 from __future__ import annotations
 
 import os
@@ -8,26 +11,52 @@ from pathlib import Path
 try:
     from dotenv import load_dotenv
     load_dotenv()
-except ImportError:  # graceful if dotenv missing
+except ImportError:
     pass
 
 
 @dataclass
 class Config:
-    data_dir: Path = field(default_factory=lambda: Path(os.getenv("SOLOOS_DATA_DIR", "./data")).resolve())
-    db_path: Path = field(default_factory=lambda: Path(os.getenv("SOLOOS_DB_PATH", "./data/soloos.sqlite")).resolve())
-    timezone: str = os.getenv("SOLOOS_TIMEZONE", "Asia/Seoul")
-    log_level: str = os.getenv("SOLOOS_LOG_LEVEL", "INFO")
+    data_dir: Path = field(
+        default_factory=lambda: Path(os.getenv("SOLOOS_DATA_DIR", "./data")).resolve()
+    )
+    db_path: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("SOLOOS_DB_PATH", "./data/soloos.sqlite")
+        ).resolve()
+    )
+    timezone: str = field(default_factory=lambda: os.getenv("SOLOOS_TIMEZONE", "Asia/Seoul"))
+    log_level: str = field(default_factory=lambda: os.getenv("SOLOOS_LOG_LEVEL", "INFO"))
+    agent_runner: str = field(
+        default_factory=lambda: os.getenv("SOLOOS_AGENT_RUNNER", "deterministic")
+    )
 
-    anthropic_key: str = os.getenv("ANTHROPIC_API_KEY", "")
-    openai_key: str = os.getenv("OPENAI_API_KEY", "")
+    anthropic_key: str = field(default_factory=lambda: os.getenv("ANTHROPIC_API_KEY", ""))
+    openai_key: str = field(default_factory=lambda: os.getenv("OPENAI_API_KEY", ""))
+    openrouter_key: str = field(default_factory=lambda: os.getenv("OPENROUTER_API_KEY", ""))
+    openrouter_base_url: str = field(
+        default_factory=lambda: os.getenv("OPENROUTER_BASE_URL", "https://openrouter.ai/api/v1")
+    )
 
-    model_reasoning: str = os.getenv("SOLOOS_MODEL_REASONING", "claude-sonnet-4-5")
-    model_bulk: str = os.getenv("SOLOOS_MODEL_BULK", "claude-haiku-4-5")
-    model_embedding: str = os.getenv("SOLOOS_MODEL_EMBEDDING", "text-embedding-3-small")
+    model_reasoning: str = field(
+        default_factory=lambda: os.getenv("SOLOOS_MODEL_REASONING", "claude-sonnet-4-5")
+    )
+    model_bulk: str = field(
+        default_factory=lambda: os.getenv("SOLOOS_MODEL_BULK", "claude-haiku-4-5")
+    )
+    model_openrouter: str = field(
+        default_factory=lambda: os.getenv(
+            "SOLOOS_OPENROUTER_MODEL", os.getenv("SOLOOS_MODEL_BULK", "openai/gpt-5-mini")
+        )
+    )
+    model_embedding: str = field(
+        default_factory=lambda: os.getenv("SOLOOS_MODEL_EMBEDDING", "text-embedding-3-small")
+    )
 
-    telegram_token: str = os.getenv("TELEGRAM_BOT_TOKEN", "")
-    telegram_ceo_chat_id: str = os.getenv("TELEGRAM_CEO_CHAT_ID", "")
+    telegram_token: str = field(default_factory=lambda: os.getenv("TELEGRAM_BOT_TOKEN", ""))
+    telegram_ceo_chat_id: str = field(
+        default_factory=lambda: os.getenv("TELEGRAM_CEO_CHAT_ID", "")
+    )
 
     def audit_dir(self) -> Path:
         p = self.data_dir / "audit"
@@ -49,9 +78,15 @@ class Config:
 _config: Config | None = None
 
 
-def get_config() -> Config:
+def get_config(reload: bool = False) -> Config:
     global _config
-    if _config is None:
+    if reload or _config is None:
         _config = Config()
         _config.ensure_dirs()
     return _config
+
+
+def reset_config() -> None:
+    """Testing helper: force re-reading env vars on next get_config()."""
+    global _config
+    _config = None

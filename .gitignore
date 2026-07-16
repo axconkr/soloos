@@ -13,6 +13,7 @@ __pycache__/
 # Data (runtime)
 data/*.sqlite
 data/*.sqlite-*
+data/*.jsonl
 data/audit/*.jsonl
 data/snapshots/
 data/workspace/
@@ -20,6 +21,11 @@ data/workspace/
 # OS
 .DS_Store
 Thumbs.db
+
+# Node / web
+node_modules/
+.next/
+out/
 
 # Editors
 .vscode/

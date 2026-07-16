@@ -1,0 +1,101 @@
+{
+  "prev": {
+    "sessions": 2,
+    "messages": 160,
+    "tool_calls": 75,
+    "total_tokens": 4105474,
+    "input_tokens": 200647,
+    "output_tokens": 19430,
+    "cache_read_tokens": 3880960,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 4437,
+    "est_cost": 0.0,
+    "platforms": 1,
+    "models": 1,
+    "roles": {
+      "assistant": 79,
+      "session_meta": 2,
+      "tool": 75,
+      "user": 4
+    },
+    "tools": [
+      {
+        "tool_name": "terminal",
+        "calls": 41
+      },
+      {
+        "tool_name": "todo",
+        "calls": 11
+      },
+      {
+        "tool_name": "skill_view",
+        "calls": 7
+      },
+      {
+        "tool_name": "patch",
+        "calls": 5
+      },
+      {
+        "tool_name": "read_file",
+        "calls": 4
+      },
+      {
+        "tool_name": "write_file",
+        "calls": 2
+      },
+      {
+        "tool_name": "browser_navigate",
+        "calls": 2
+      },
+      {
+        "tool_name": "session_search",
+        "calls": 1
+      }
+    ],
+    "daily": [
+      {
+        "day": "2026-07-10",
+        "sessions": 1,
+        "messages": 77,
+        "tools": 36
+      },
+      {
+        "day": "2026-07-12",
+        "sessions": 1,
+        "messages": 83,
+        "tools": 39
+      }
+    ],
+    "platform_breakdown": [
+      {
+        "source": "telegram",
+        "sessions": 2,
+        "messages": 160,
+        "tools": 75
+      }
+    ],
+    "start": "2026-07-06",
+    "end": "2026-07-13"
+  },
+  "this": {
+    "sessions": 0,
+    "messages": 0,
+    "tool_calls": 0,
+    "total_tokens": 0,
+    "input_tokens": 0,
+    "output_tokens": 0,
+    "cache_read_tokens": 0,
+    "cache_write_tokens": 0,
+    "reasoning_tokens": 0,
+    "est_cost": 0,
+    "platforms": 0,
+    "models": 0,
+    "roles": {},
+    "tools": [],
+    "daily": [],
+    "platform_breakdown": [],
+    "start": "2026-07-13",
+    "end": "2026-07-20"
+  },
+  "generated_at": "2026-07-13 09:00:42 KST"
+}

@@ -1,0 +1,798 @@
+{
+  "generated_at": 1784181830,
+  "db_path": "/home/user/projects/ai-native-company/soloos/data/soloos.sqlite",
+  "counts": {
+    "agents": 7,
+    "actions": 8,
+    "workflows": 1,
+    "workflow_steps": 1,
+    "approvals": 6,
+    "audit_events": 24
+  },
+  "agents": [
+    {
+      "id": "agent:ceo_office",
+      "name": "CEO Office / Chief of Staff",
+      "mission": "Translate Phillip's intent into priorities, decision gates, and daily operating briefs.",
+      "tier": "reasoning",
+      "tone": "blunt, CEO-readable, evidence-first",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_request_clarification": true,
+        "can_set_priorities": false,
+        "requires_approval_for_strategy": true
+      },
+      "kpi": {
+        "primary": "decision_latency",
+        "secondary": "weekly_execution_throughput"
+      },
+      "skills": [
+        "product_discovery",
+        "planning",
+        "decision_briefs",
+        "mission_control"
+      ]
+    },
+    {
+      "id": "agent:cfo",
+      "name": "Finance / CFO",
+      "mission": "Track cash, costs, invoices, and financial risk without making final tax or investment judgments.",
+      "tier": "reasoning",
+      "tone": "conservative, exact, risk-aware",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_file_taxes": false,
+        "can_move_money": false,
+        "requires_approval_for_money": true
+      },
+      "kpi": {
+        "primary": "cash_visibility",
+        "secondary": "cost_control"
+      },
+      "skills": [
+        "cashflow",
+        "invoices",
+        "cost_review",
+        "finance_checklists"
+      ]
+    },
+    {
+      "id": "agent:cto",
+      "name": "Engineering / CTO",
+      "mission": "Ship verified software changes for SoloOS, ax-con.com, soloforge.me, and client systems.",
+      "tier": "reasoning",
+      "tone": "technical, test-driven, concise",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_create_local_files": true,
+        "can_deploy_production": false,
+        "can_write_code": true,
+        "requires_approval_for_public_repo_or_prod": true
+      },
+      "kpi": {
+        "primary": "verified_shipments",
+        "secondary": "regression_rate"
+      },
+      "skills": [
+        "superpowers",
+        "context7",
+        "webapp_testing",
+        "tdd",
+        "github_workflow"
+      ]
+    },
+    {
+      "id": "agent:design",
+      "name": "Design / Brand",
+      "mission": "Turn strategy and product intent into usable interfaces, brand systems, and visual artifacts.",
+      "tier": "reasoning",
+      "tone": "tasteful, concrete, conversion-aware",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_change_public_brand": false,
+        "can_generate_designs": true,
+        "requires_approval_for_brand_lock": true
+      },
+      "kpi": {
+        "primary": "approved_design_assets",
+        "secondary": "ux_defect_rate"
+      },
+      "skills": [
+        "ui_ux_pro_max",
+        "taste",
+        "brand_guidelines",
+        "web_artifacts"
+      ]
+    },
+    {
+      "id": "agent:general_counsel",
+      "name": "Legal / Compliance",
+      "mission": "Flag legal, contract, privacy, and compliance risks for human review.",
+      "tier": "reasoning",
+      "tone": "careful, non-lawyer, risk-focused",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_provide_final_legal_advice": false,
+        "can_review_contracts": true,
+        "requires_human_legal_review": true
+      },
+      "kpi": {
+        "primary": "risk_flags_caught",
+        "secondary": "review_turnaround"
+      },
+      "skills": [
+        "contract_review",
+        "nda_checklist",
+        "privacy_checklist",
+        "compliance_triage"
+      ]
+    },
+    {
+      "id": "agent:growth",
+      "name": "Growth / Marketing",
+      "mission": "Create positioning, content, campaigns, and social assets for Phillip's offers.",
+      "tier": "reasoning",
+      "tone": "sharp, practical, market-aware",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_draft_public_content": true,
+        "can_publish": false,
+        "requires_approval_for_external_send": true
+      },
+      "kpi": {
+        "primary": "qualified_leads",
+        "secondary": "content_velocity"
+      },
+      "skills": [
+        "copywriting",
+        "seo",
+        "lead_magnets",
+        "campaigns",
+        "social_media"
+      ]
+    },
+    {
+      "id": "agent:ops",
+      "name": "Ops / Automation",
+      "mission": "Keep workflows, automations, Google Workspace, notifications, and delivery operations moving.",
+      "tier": "bulk",
+      "tone": "systematic, operational, terse",
+      "status": "active",
+      "updated_at": 1784181830,
+      "authority": {
+        "can_change_production": false,
+        "can_run_local_automation": true,
+        "requires_approval_for_prod": true
+      },
+      "kpi": {
+        "primary": "cycle_time",
+        "secondary": "automation_reliability"
+      },
+      "skills": [
+        "workflow",
+        "automation",
+        "google_workspace",
+        "telegram",
+        "cron",
+        "reporting"
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "id": "A-0030",
+      "ts": 1784181830,
+      "actor": "agent:growth",
+      "action_type": "sales_task",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784181830,
+      "completed_at": null,
+      "params": {
+        "type": "reply_draft"
+      }
+    },
+    {
+      "id": "A-0028",
+      "ts": 1784172979,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172979,
+      "completed_at": null,
+      "params": {
+        "type": "content"
+      }
+    },
+    {
+      "id": "A-0026",
+      "ts": 1784172451,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172451,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0021",
+      "ts": 1784172019,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172019,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0017",
+      "ts": 1784171282,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784171282,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0013",
+      "ts": 1784170972,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784170972,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0010",
+      "ts": 1784169850,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784169850,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0007",
+      "ts": 1783057929,
+      "actor": "agent:cmo",
+      "action_type": "content_plan",
+      "target": "command_deck:telegram:1971680823:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "success",
+      "cost_krw": 0,
+      "latency_ms": 75,
+      "snapshot_ref": "workflow://WF-0001",
+      "created_at": 1783057929,
+      "completed_at": 1783057929,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "id": "WF-0001",
+      "created_at": 1783057929,
+      "updated_at": 1783057937,
+      "source_action_id": "A-0007",
+      "actor": "agent:cmo",
+      "workflow_type": "content_plan",
+      "title": "Create 1 blog draft(s) for this_week",
+      "status": "success",
+      "params": {
+        "count": 1,
+        "period": "this_week",
+        "type": "blog"
+      }
+    }
+  ],
+  "workflow_steps": [
+    {
+      "id": "WS-0001",
+      "workflow_id": "WF-0001",
+      "step_order": 1,
+      "actor": "agent:cmo",
+      "action_type": "draft_content",
+      "target": "workflow:WF-0001:step:1",
+      "status": "success",
+      "created_at": 1783057929,
+      "completed_at": 1783057937,
+      "output_ref": "file:///home/user/projects/ai-native-company/soloos/data/workspace/content/WF-0001/WS-0001.md",
+      "output_text": "OpenRouter draft written: Blog draft 1 (blog)",
+      "params": {
+        "period": "this_week",
+        "source_action_id": "A-0007",
+        "title": "Blog draft 1",
+        "type": "blog"
+      }
+    }
+  ],
+  "approvals": [
+    {
+      "id": "AP-0006",
+      "created_at": 1784172410,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-auth-boundary",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784172451,
+      "decided_by": "ceo:web",
+      "comment": "auth boundary browser smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0005",
+      "created_at": 1784171988,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-boundary",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784172037,
+      "decided_by": "ceo:web",
+      "comment": "service boundary browser smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0004",
+      "created_at": 1784171081,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-browser",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784171303,
+      "decided_by": "ceo:web",
+      "comment": "browser console smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0003",
+      "created_at": 1784170943,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-smoke",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784170972,
+      "decided_by": "ceo:web",
+      "comment": "curl smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0002",
+      "created_at": 1782902250,
+      "agent_id": "finance",
+      "action_type": "task_create",
+      "target": "reminder",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "HIGH",
+      "policy_rule": "guardrail:two_key_5M",
+      "status": "rejected",
+      "decided_at": 1782902257,
+      "decided_by": "ceo",
+      "comment": "예산 초과",
+      "audit_id": null,
+      "params": {
+        "amount_krw": 6000000
+      }
+    },
+    {
+      "id": "AP-0001",
+      "created_at": 1782902249,
+      "agent_id": "cmo",
+      "action_type": "publish",
+      "target": "blog:hello",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "MED",
+      "policy_rule": "content_publish",
+      "status": "approved",
+      "decided_at": 1782902256,
+      "decided_by": "ceo",
+      "comment": "톤 OK",
+      "audit_id": null,
+      "params": {
+        "title": "AI Native Ops 3부",
+        "word_count": 1200
+      }
+    }
+  ],
+  "audit_events": [
+    {
+      "id": "A-0031",
+      "ts": 1784181830,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 4425,
+      "content_hash": "sha256:20428bc7ca0bea0d"
+    },
+    {
+      "id": "A-0029",
+      "ts": 1784172979,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 4083,
+      "content_hash": "sha256:d6b1464262bc5e61"
+    },
+    {
+      "id": "A-0027",
+      "ts": 1784172451,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 3741,
+      "content_hash": "sha256:d0480289ed1c2bd7"
+    },
+    {
+      "id": "A-0025",
+      "ts": 1784172451,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0006",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 3452,
+      "content_hash": "sha256:253212a7c9849e1b"
+    },
+    {
+      "id": "A-0024",
+      "ts": 1784172410,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0006",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 3138,
+      "content_hash": "sha256:97cab27fd76d4fb4"
+    },
+    {
+      "id": "A-0023",
+      "ts": 1784172037,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0005",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 2846,
+      "content_hash": "sha256:46c4863c8662fc00"
+    },
+    {
+      "id": "A-0022",
+      "ts": 1784172019,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 2504,
+      "content_hash": "sha256:9c56476a77870631"
+    },
+    {
+      "id": "A-0020",
+      "ts": 1784171989,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0005",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 2195,
+      "content_hash": "sha256:35f45cebf622f08b"
+    },
+    {
+      "id": "A-0019",
+      "ts": 1784171303,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0004",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 1912,
+      "content_hash": "sha256:c231d66591f34cf5"
+    },
+    {
+      "id": "A-0018",
+      "ts": 1784171282,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 1570,
+      "content_hash": "sha256:92d34a09687dd826"
+    },
+    {
+      "id": "A-0016",
+      "ts": 1784171081,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0004",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 1262,
+      "content_hash": "sha256:3ed1749d226b1ca5"
+    },
+    {
+      "id": "A-0015",
+      "ts": 1784170972,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0003",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 990,
+      "content_hash": "sha256:e5868eabfcb744f8"
+    },
+    {
+      "id": "A-0014",
+      "ts": 1784170972,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 648,
+      "content_hash": "sha256:bb387f2f8ef24d2d"
+    },
+    {
+      "id": "A-0012",
+      "ts": 1784170943,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0003",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 342,
+      "content_hash": "sha256:b1d946f4f6293edb"
+    },
+    {
+      "id": "A-0011",
+      "ts": 1784169850,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:82d26b1c36815c77"
+    },
+    {
+      "id": "STEP-WS-0001",
+      "ts": 1783057950,
+      "actor": "agent:cmo",
+      "action_type": "workflow_step_run",
+      "target": "workflow:WF-0001:step:WS-0001",
+      "status": "success",
+      "policy_rule": null,
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "line_offset": 747,
+      "content_hash": "sha256:3ab6abc63617fc21"
+    },
+    {
+      "id": "A-0009",
+      "ts": 1783057929,
+      "actor": "system:actions",
+      "action_type": "action_run",
+      "target": "action:A-0007",
+      "status": "success",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "line_offset": 363,
+      "content_hash": "sha256:5e606bc4004c10c8"
+    },
+    {
+      "id": "A-0008",
+      "ts": 1783057929,
+      "actor": "user:telegram:1971680823",
+      "action_type": "deck_dispatch",
+      "target": "session:telegram:1971680823:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:6c6f94c89ff90959"
+    },
+    {
+      "id": "A-0006",
+      "ts": 1782902257,
+      "actor": "user:ceo",
+      "action_type": "approval_rejected",
+      "target": "approval:AP-0002",
+      "status": "success",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 1345,
+      "content_hash": "sha256:5c6b52b975a21cac"
+    },
+    {
+      "id": "A-0005",
+      "ts": 1782902256,
+      "actor": "user:ceo",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0001",
+      "status": "success",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 1081,
+      "content_hash": "sha256:f21dacfc10ac493f"
+    },
+    {
+      "id": "A-0004",
+      "ts": 1782902250,
+      "actor": "agent:finance",
+      "action_type": "request_approval",
+      "target": "approval:AP-0002",
+      "status": "pending",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 793,
+      "content_hash": "sha256:0930241e84f4a1e8"
+    },
+    {
+      "id": "A-0003",
+      "ts": 1782902249,
+      "actor": "agent:ops",
+      "action_type": "delete",
+      "target": "db:prod",
+      "status": "deny",
+      "policy_rule": "no_prod_delete",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 542,
+      "content_hash": "sha256:b94ee87c2e353740"
+    },
+    {
+      "id": "A-0002",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "request_approval",
+      "target": "approval:AP-0001",
+      "status": "pending",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 262,
+      "content_hash": "sha256:c71568bdcf707f64"
+    },
+    {
+      "id": "A-0001",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "draft_content",
+      "target": "blog:hello",
+      "status": "auto",
+      "policy_rule": "internal_drafts",
+      "cost_krw": 0,
+      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:b251343a7316b92e"
+    }
+  ]
+}

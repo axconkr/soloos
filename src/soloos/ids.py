@@ -1,4 +1,7 @@
-"""Sequential ID generator for domain entities (A-, AP-, C-, D-, ...)."""
+"""Sequential ID generator for domain entities (A-, AP-, C-, D-, ...).
+
+Uses BEGIN IMMEDIATE to guarantee atomic increment across concurrent processes.
+"""
 from __future__ import annotations
 
 from .db import connect
@@ -13,11 +16,24 @@ CREATE TABLE IF NOT EXISTS id_counters (
 
 def next_id(prefix: str) -> str:
     conn = connect()
-    with conn:
+    try:
         conn.execute(_COUNTER_TABLE_SQL)
-        conn.execute("INSERT OR IGNORE INTO id_counters (prefix) VALUES (?)", (prefix,))
-        row = conn.execute("SELECT next_value FROM id_counters WHERE prefix = ?", (prefix,)).fetchone()
+        conn.execute("BEGIN IMMEDIATE")
+        conn.execute("INSERT OR IGNORE INTO id_counters (prefix, next_value) VALUES (?, 1)", (prefix,))
+        row = conn.execute(
+            "SELECT next_value FROM id_counters WHERE prefix = ?", (prefix,)
+        ).fetchone()
         current = row["next_value"]
-        conn.execute("UPDATE id_counters SET next_value = next_value + 1 WHERE prefix = ?", (prefix,))
-    conn.close()
+        conn.execute(
+            "UPDATE id_counters SET next_value = next_value + 1 WHERE prefix = ?", (prefix,)
+        )
+        conn.execute("COMMIT")
+    except Exception:
+        try:
+            conn.execute("ROLLBACK")
+        except Exception:
+            pass
+        raise
+    finally:
+        conn.close()
     return f"{prefix}-{current:04d}"
