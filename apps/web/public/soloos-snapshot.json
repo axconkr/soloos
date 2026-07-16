@@ -1,13 +1,15 @@
 {
-  "generated_at": 1784183328,
+  "generated_at": 1784206820,
   "db_path": "soloos.sqlite",
   "counts": {
     "agents": 7,
+    "agent_templates": 5,
+    "agent_instances": 5,
     "actions": 8,
     "workflows": 1,
     "workflow_steps": 1,
-    "approvals": 9,
-    "audit_events": 37
+    "approvals": 11,
+    "audit_events": 46
   },
   "agents": [
     {
@@ -182,6 +184,300 @@
         "cron",
         "reporting"
       ]
+    }
+  ],
+  "agent_templates": [
+    {
+      "id": "web-ops-duplicate-recovery-smoke-nfoa4b",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201782,
+      "updated_at": 1784201782,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-duplicate-recovery-smoke",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201480,
+      "updated_at": 1784201781,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-duplicate-recovery-smoke-nfo7wl",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201779,
+      "updated_at": 1784201779,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-api-prod-smoke-1784200381",
+      "name": "API Prod Smoke Agent",
+      "department_agent_id": "agent:ops",
+      "mission_template": "API production smoke test agent draft creation for verification only. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784200382,
+      "updated_at": 1784200382,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "api_prod_smoke_pass",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-api-smoke-1784199788",
+      "name": "API Smoke Agent",
+      "department_agent_id": "agent:ops",
+      "mission_template": "API smoke test agent draft creation for verification only. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784199789,
+      "updated_at": 1784199789,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "api_smoke_pass",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    }
+  ],
+  "agent_instances": [
+    {
+      "id": "agent_instance:duplicate-recovery-smoke-nfoa4b",
+      "agent_id": "agent:generated:duplicate-recovery-smoke-nfoa4b",
+      "template_id": "web-ops-duplicate-recovery-smoke-nfoa4b",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke-nfoa4b",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke-nfoa4b",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201783,
+      "activated_at": null,
+      "updated_at": 1784201783,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke-nfoa4b"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:duplicate-recovery-smoke-nfo7wl",
+      "agent_id": "agent:generated:duplicate-recovery-smoke-nfo7wl",
+      "template_id": "web-ops-duplicate-recovery-smoke-nfo7wl",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke-nfo7wl",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke-nfo7wl",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201780,
+      "activated_at": null,
+      "updated_at": 1784201780,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke-nfo7wl"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:duplicate-recovery-smoke",
+      "agent_id": "agent:generated:duplicate-recovery-smoke",
+      "template_id": "web-ops-duplicate-recovery-smoke",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201481,
+      "activated_at": null,
+      "updated_at": 1784201481,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:api-prod-smoke-1784200381",
+      "agent_id": "agent:generated:api-prod-smoke-1784200381",
+      "template_id": "web-ops-api-prod-smoke-1784200381",
+      "owner_agent_id": "agent:ops",
+      "slug": "api-prod-smoke-1784200381",
+      "name": "API Prod Smoke Agent / api-prod-smoke-1784200381",
+      "mission": "API production smoke test agent draft creation for verification only. API Prod Smoke Agent",
+      "risk_tier": "LOW",
+      "lifecycle_status": "review",
+      "policy_status": "approval_required",
+      "approval_id": "AP-0011",
+      "created_by": "employee:web-smoke",
+      "created_at": 1784200382,
+      "activated_at": null,
+      "updated_at": 1784200384,
+      "mission_vars": {
+        "objective": "API Prod Smoke Agent"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-api-prod-smoke-1784200381"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "kpi": {
+        "primary": "api_prod_smoke_pass",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:api-smoke-1784199788",
+      "agent_id": "agent:generated:api-smoke-1784199788",
+      "template_id": "web-ops-api-smoke-1784199788",
+      "owner_agent_id": "agent:ops",
+      "slug": "api-smoke-1784199788",
+      "name": "API Smoke Agent / api-smoke-1784199788",
+      "mission": "API smoke test agent draft creation for verification only. API Smoke Agent",
+      "risk_tier": "LOW",
+      "lifecycle_status": "review",
+      "policy_status": "approval_required",
+      "approval_id": "AP-0010",
+      "created_by": "employee:web-smoke",
+      "created_at": 1784199790,
+      "activated_at": null,
+      "updated_at": 1784199800,
+      "mission_vars": {
+        "objective": "API Smoke Agent"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-api-smoke-1784199788"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "kpi": {
+        "primary": "api_smoke_pass",
+        "review_required": true
+      }
     }
   ],
   "actions": [
@@ -374,6 +670,54 @@
   ],
   "approvals": [
     {
+      "id": "AP-0011",
+      "created_at": 1784200384,
+      "agent_id": "ops",
+      "action_type": "agent_factory_activate",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "pending",
+      "decided_at": null,
+      "decided_by": null,
+      "comment": null,
+      "audit_id": null,
+      "params": {
+        "template_id": "web-ops-api-prod-smoke-1784200381",
+        "risk_tier": "LOW",
+        "generated_agent_id": "agent:generated:api-prod-smoke-1784200381",
+        "created_by": "employee:web-smoke",
+        "requested_by": "employee:web-smoke",
+        "env": "production"
+      }
+    },
+    {
+      "id": "AP-0010",
+      "created_at": 1784199800,
+      "agent_id": "ops",
+      "action_type": "agent_factory_activate",
+      "target": "agent_instance:api-smoke-1784199788",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "pending",
+      "decided_at": null,
+      "decided_by": null,
+      "comment": null,
+      "audit_id": null,
+      "params": {
+        "template_id": "web-ops-api-smoke-1784199788",
+        "risk_tier": "LOW",
+        "generated_agent_id": "agent:generated:api-smoke-1784199788",
+        "created_by": "employee:web-smoke",
+        "requested_by": "employee:web-smoke",
+        "env": "production"
+      }
+    },
+    {
       "id": "AP-0009",
       "created_at": 1784183318,
       "agent_id": "agent:growth",
@@ -533,6 +877,123 @@
     }
   ],
   "audit_events": [
+    {
+      "id": "A-0053",
+      "ts": 1784201783,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke-nfoa4b",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11895,
+      "content_hash": "sha256:28958214cd451c26"
+    },
+    {
+      "id": "A-0052",
+      "ts": 1784201780,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke-nfo7wl",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11440,
+      "content_hash": "sha256:218c88f5121211b6"
+    },
+    {
+      "id": "A-0051",
+      "ts": 1784201481,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11006,
+      "content_hash": "sha256:b53ee788455abcae"
+    },
+    {
+      "id": "A-0050",
+      "ts": 1784200384,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_activation_requested",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "status": "approval_required",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 10627,
+      "content_hash": "sha256:d86d1173a5f01a90"
+    },
+    {
+      "id": "A-0049",
+      "ts": 1784200384,
+      "actor": "agent:ops",
+      "action_type": "request_approval",
+      "target": "approval:AP-0011",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 10325,
+      "content_hash": "sha256:433c9b8e66bc391a"
+    },
+    {
+      "id": "A-0048",
+      "ts": 1784200382,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9888,
+      "content_hash": "sha256:1092b77699543a88"
+    },
+    {
+      "id": "A-0047",
+      "ts": 1784199800,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_activation_requested",
+      "target": "agent_instance:api-smoke-1784199788",
+      "status": "approval_required",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9519,
+      "content_hash": "sha256:b9ebf4d5a8fb2da5"
+    },
+    {
+      "id": "A-0046",
+      "ts": 1784199800,
+      "actor": "agent:ops",
+      "action_type": "request_approval",
+      "target": "approval:AP-0010",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9222,
+      "content_hash": "sha256:7d9195f766d9b0d9"
+    },
+    {
+      "id": "A-0045",
+      "ts": 1784199790,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:api-smoke-1784199788",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 8800,
+      "content_hash": "sha256:27edc91884158066"
+    },
     {
       "id": "A-0044",
       "ts": 1784183328,
@@ -857,6 +1318,162 @@
       "file_path": "2026-07-16.jsonl",
       "line_offset": 990,
       "content_hash": "sha256:e5868eabfcb744f8"
+    },
+    {
+      "id": "A-0014",
+      "ts": 1784170972,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 648,
+      "content_hash": "sha256:bb387f2f8ef24d2d"
+    },
+    {
+      "id": "A-0012",
+      "ts": 1784170943,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0003",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 342,
+      "content_hash": "sha256:b1d946f4f6293edb"
+    },
+    {
+      "id": "A-0011",
+      "ts": 1784169850,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:82d26b1c36815c77"
+    },
+    {
+      "id": "STEP-WS-0001",
+      "ts": 1783057950,
+      "actor": "agent:cmo",
+      "action_type": "workflow_step_run",
+      "target": "workflow:WF-0001:step:WS-0001",
+      "status": "success",
+      "policy_rule": null,
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 747,
+      "content_hash": "sha256:3ab6abc63617fc21"
+    },
+    {
+      "id": "A-0009",
+      "ts": 1783057929,
+      "actor": "system:actions",
+      "action_type": "action_run",
+      "target": "action:A-0007",
+      "status": "success",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 363,
+      "content_hash": "sha256:5e606bc4004c10c8"
+    },
+    {
+      "id": "A-0008",
+      "ts": 1783057929,
+      "actor": "user:telegram:redacted",
+      "action_type": "deck_dispatch",
+      "target": "session:telegram:redacted:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:6c6f94c89ff90959"
+    },
+    {
+      "id": "A-0006",
+      "ts": 1782902257,
+      "actor": "user:ceo",
+      "action_type": "approval_rejected",
+      "target": "approval:AP-0002",
+      "status": "success",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 1345,
+      "content_hash": "sha256:5c6b52b975a21cac"
+    },
+    {
+      "id": "A-0005",
+      "ts": 1782902256,
+      "actor": "user:ceo",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0001",
+      "status": "success",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 1081,
+      "content_hash": "sha256:f21dacfc10ac493f"
+    },
+    {
+      "id": "A-0004",
+      "ts": 1782902250,
+      "actor": "agent:finance",
+      "action_type": "request_approval",
+      "target": "approval:AP-0002",
+      "status": "pending",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 793,
+      "content_hash": "sha256:0930241e84f4a1e8"
+    },
+    {
+      "id": "A-0003",
+      "ts": 1782902249,
+      "actor": "agent:ops",
+      "action_type": "delete",
+      "target": "db:prod",
+      "status": "deny",
+      "policy_rule": "no_prod_delete",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 542,
+      "content_hash": "sha256:b94ee87c2e353740"
+    },
+    {
+      "id": "A-0002",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "request_approval",
+      "target": "approval:AP-0001",
+      "status": "pending",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 262,
+      "content_hash": "sha256:c71568bdcf707f64"
+    },
+    {
+      "id": "A-0001",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "draft_content",
+      "target": "blog:hello",
+      "status": "auto",
+      "policy_rule": "internal_drafts",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:b251343a7316b92e"
     }
   ]
 }

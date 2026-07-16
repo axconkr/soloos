@@ -32,6 +32,22 @@ function text(value: unknown, fallback = "-") {
   return String(value);
 }
 
+function record(value: unknown): Record<string, unknown> {
+  return value && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : {};
+}
+
+function compactList(values: string[]) {
+  return values.filter((value) => value && value !== "-");
+}
+
+function readableObject(value: unknown) {
+  if (Array.isArray(value)) return value.map((item) => text(item)).join(", ");
+  const object = record(value);
+  const entries = Object.entries(object);
+  if (!entries.length) return text(value);
+  return compactList(entries.map(([key, item]) => `${key}: ${Array.isArray(item) ? item.map((child) => text(child)).join(", ") : text(item)}`)).join(" · ");
+}
+
 function formatTime(epoch?: unknown) {
   if (typeof epoch !== "number") return "아직 없음";
   return new Intl.DateTimeFormat("ko-KR", {
@@ -109,6 +125,10 @@ type ApprovalItem = {
   department: string;
   risk: string;
   action: string;
+  decisionQuestion: string;
+  impact: string;
+  details: { label: string; value: string }[];
+  payloadSummary?: string;
 };
 
 function approvalRisk(risk: unknown) {
@@ -122,16 +142,63 @@ function approvalKey(item: ApprovalItem, index: number) {
   return item.approval_id || `${item.title}-${item.department}-${index}`;
 }
 
+function approvalDetails(approval: RuntimeRow, snapshot: Snapshot | null) {
+  const params = record(approval.params ?? approval.params_json);
+  const target = text(approval.target, "대상 미지정");
+  const approvalId = text(approval.id, "");
+  const generatedAgentId = text(params.generated_agent_id, "");
+  const templateId = text(params.template_id, "");
+  const matchedInstance = snapshot?.agent_instances?.find((instance) => (
+    text(instance.approval_id, "") === approvalId
+    || text(instance.agent_id, "") === generatedAgentId
+    || text(instance.template_id, "") === templateId
+    || target.includes(text(instance.id, "__no_match__"))
+  ));
+  const matchedTemplate = snapshot?.agent_templates?.find((template) => text(template.id, "") === templateId);
+  const authority = record(matchedInstance?.authority ?? matchedInstance?.authority_json);
+  const kpi = record(matchedInstance?.kpi ?? matchedInstance?.kpi_json);
+  const capabilitySet = matchedInstance?.capability_set ?? matchedInstance?.capability_set_json;
+  const capabilityText = readableObject(capabilitySet);
+  const env = text(params.env, "production");
+  const previewUrl = text(approval.preview_url, "-");
+  const details = [
+    { label: "승인 질문", value: approval.action_type === "agent_factory_activate" ? "이 AI 직원을 실제 운영에 활성화할까요?" : "이 작업을 실행/공개해도 될까요?" },
+    { label: "대상", value: target },
+    { label: "미션", value: text(matchedInstance?.mission ?? matchedTemplate?.mission_template, "요청 상세 미기록") },
+    { label: "권한", value: compactList(Object.entries(authority).map(([key, value]) => `${key}: ${text(value)}`)).join(" · ") || "권한 정보 미기록" },
+    { label: "KPI", value: compactList(Object.entries(kpi).map(([key, value]) => `${key}: ${text(value)}`)).join(" · ") || "KPI 정보 미기록" },
+    { label: "기능", value: capabilityText },
+    { label: "정책/환경", value: `${text(approval.policy_rule, "정책 미기록")} · ${env}` },
+    { label: "예상 비용", value: `${Number(approval.cost_krw ?? 0).toLocaleString("ko-KR")}원` },
+    { label: "미리보기", value: previewUrl },
+  ];
+  const payloadSummary = compactList([
+    generatedAgentId ? `생성 Agent: ${generatedAgentId}` : "",
+    templateId ? `Template: ${templateId}` : "",
+    text(params.created_by, "") !== "-" ? `작성: ${text(params.created_by)}` : "",
+    text(params.requested_by, "") !== "-" ? `요청: ${text(params.requested_by)}` : "",
+  ]).join(" · ");
+  return { details, payloadSummary };
+}
+
 function approvalItems(snapshot: Snapshot | null): ApprovalItem[] {
   const pendingApprovals = snapshot?.approvals?.filter((approval) => text(approval.status) === "pending") ?? [];
   if (pendingApprovals.length) {
-    return pendingApprovals.slice(0, 3).map((approval) => ({
-      approval_id: text(approval.id),
-      title: text(approval.action_type, "승인 대기 작업"),
-      department: departmentLabel(approval.agent_id),
-      risk: approvalRisk(approval.risk),
-      action: `${text(approval.target, "대상 미지정")} · 대표가 승인/거절/수정 요청 결정`,
-    }));
+    return pendingApprovals.slice(0, 3).map((approval) => {
+      const { details, payloadSummary } = approvalDetails(approval, snapshot);
+      const title = text(approval.action_type, "승인 대기 작업");
+      return {
+        approval_id: text(approval.id),
+        title,
+        department: departmentLabel(approval.agent_id),
+        risk: approvalRisk(approval.risk),
+        action: `${text(approval.target, "대상 미지정")} · 대표가 승인/거절/수정 요청 결정`,
+        decisionQuestion: title === "agent_factory_activate" ? "새 AI 직원을 켜도 되는지 판단" : "작업 실행/공개 여부 판단",
+        impact: title === "agent_factory_activate" ? "승인하면 이 Agent Instance가 운영 대기에서 활성화 대상으로 전환됩니다." : "승인하면 담당 AI 부서가 다음 실행 단계로 넘어갑니다.",
+        details,
+        payloadSummary,
+      };
+    });
   }
   const latestStep = snapshot?.workflow_steps?.[0];
   const pendingActions = snapshot?.actions?.filter((action) => text(action.status) === "pending") ?? [];
@@ -142,6 +209,14 @@ function approvalItems(snapshot: Snapshot | null): ApprovalItem[] {
       department: departmentLabel(action.actor),
       risk: "노랑",
       action: "대표가 승인/거절/수정 요청 결정",
+      decisionQuestion: "대기 중인 작업을 계속 진행할까요?",
+      impact: "승인 기록이 없는 pending action입니다. 세부 payload가 있으면 아래에 표시됩니다.",
+      details: [
+        { label: "대상", value: text(action.target, "대상 미지정") },
+        { label: "정책/상태", value: `${text(action.policy_rule, "정책 미기록")} · ${text(action.status, "pending")}` },
+        { label: "예상 비용", value: `${Number(action.cost_krw ?? 0).toLocaleString("ko-KR")}원` },
+      ],
+      payloadSummary: JSON.stringify(action.params ?? action.params_json ?? {}),
     }));
   }
   if (latestStep?.status === "success") {
@@ -152,11 +227,17 @@ function approvalItems(snapshot: Snapshot | null): ApprovalItem[] {
         department: departmentLabel(latestStep.actor),
         risk: "노랑",
         action: "초안 확인 후 공개 발행 여부 결정",
+        decisionQuestion: "완료 산출물을 공개/전달해도 될까요?",
+        impact: "승인하면 다음 단계는 공개 발행 또는 고객 전달입니다.",
+        details: [
+          { label: "산출물", value: text(latestStep.output_ref, "산출물 없음") },
+          { label: "결과", value: text(latestStep.output_text, "결과 요약 없음") },
+        ],
       },
-      ...approvalExamples.slice(1).map((item) => ({ ...item, approval_id: undefined })),
+      ...approvalExamples.slice(1).map((item) => ({ ...item, approval_id: undefined, decisionQuestion: "대표 판단 필요", impact: item.action, details: [{ label: "요청", value: item.action }] })),
     ];
   }
-  return approvalExamples.map((item) => ({ ...item, approval_id: undefined }));
+  return approvalExamples.map((item) => ({ ...item, approval_id: undefined, decisionQuestion: "대표 판단 필요", impact: item.action, details: [{ label: "요청", value: item.action }] }));
 }
 
 export default function Home() {
@@ -327,6 +408,22 @@ export default function Home() {
                 <div>
                   <strong>{item.title}</strong>
                   <p>{item.department} · {item.action}</p>
+                  <div className="approval-brief" aria-label={`${item.title} 판단 근거`}>
+                    <div className="approval-question">
+                      <span>대표가 판단할 내용</span>
+                      <strong>{item.decisionQuestion}</strong>
+                      <p>{item.impact}</p>
+                    </div>
+                    <dl className="approval-detail-grid">
+                      {item.details.map((detail) => (
+                        <div key={`${item.title}-${detail.label}`}>
+                          <dt>{detail.label}</dt>
+                          <dd>{detail.value}</dd>
+                        </div>
+                      ))}
+                    </dl>
+                    {item.payloadSummary ? <p className="approval-payload">근거 payload · {item.payloadSummary}</p> : null}
+                  </div>
                   <div className="approval-actions" aria-label={`${item.title} 결정`}>
                     <button type="button" onClick={() => sendApprovalDecision(item, "approve")}>승인</button>
                     <button type="button" onClick={() => sendApprovalDecision(item, "reject")}>반려</button>

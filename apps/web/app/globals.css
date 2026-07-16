@@ -101,6 +101,16 @@ h1 { margin: 0; max-width: 900px; font-size: clamp(42px, 6vw, 82px); line-height
 .approval-item { display: grid; grid-template-columns: 64px 1fr; gap: 13px; align-items: start; padding: 14px; border: 1px solid rgba(255,255,255,.08); border-radius: 18px; background: rgba(0,0,0,.18); }
 .approval-item strong { display: block; font-size: 17px; }
 .approval-item p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
+.approval-brief { margin-top: 12px; display: grid; gap: 10px; }
+.approval-question { padding: 12px; border: 1px solid rgba(251,191,36,.24); border-radius: 16px; background: rgba(251,191,36,.075); }
+.approval-question span { display: block; color: #fde68a; font-size: 12px; font-weight: 800; margin-bottom: 4px; }
+.approval-question strong { font-size: 15px; line-height: 1.35; }
+.approval-question p { margin-top: 6px !important; }
+.approval-detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 0; }
+.approval-detail-grid div { padding: 10px; border: 1px solid rgba(255,255,255,.08); border-radius: 14px; background: rgba(255,255,255,.035); min-width: 0; }
+.approval-detail-grid dt { color: var(--muted); font-size: 11px; font-weight: 800; margin-bottom: 4px; }
+.approval-detail-grid dd { margin: 0; color: var(--text); font-size: 12px; line-height: 1.38; overflow-wrap: anywhere; }
+.approval-payload { margin-top: 0 !important; padding: 9px 10px; border-radius: 12px; background: rgba(0,0,0,.2); font-family: "JetBrains Mono", monospace; font-size: 11px !important; overflow-wrap: anywhere; }
 .approval-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .approval-actions button, .ask-form button, .detail-button {
   min-height: 40px;
@@ -196,7 +206,7 @@ h1 { margin: 0; max-width: 900px; font-size: clamp(42px, 6vw, 82px); line-height
   .ceo-shell { width: min(100vw - 22px, 1180px); padding-top: 22px; }
   .brief-stack div, .plain-list div, .approval-item { grid-template-columns: 1fr; }
   .status-card strong, .score-card strong { font-size: 34px; }
-  .department-grid, .flow-line, .detail-metrics { grid-template-columns: 1fr; }
+  .department-grid, .flow-line, .detail-metrics, .approval-detail-grid { grid-template-columns: 1fr; }
 }
 
 
