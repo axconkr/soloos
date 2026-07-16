@@ -139,9 +139,9 @@ def test_export_mission_control_snapshot_reads_soloos_runtime_tables(tmp_path):
         (
             "STEP-WS-0001",
             106,
-            "agent:growth",
+            "user:telegram:1971680823",
             "workflow_step_run",
-            "workflow:WF-0001:step:WS-0001",
+            "session:telegram:1971680823:",
             "success",
             None,
             0,
@@ -157,6 +157,8 @@ def test_export_mission_control_snapshot_reads_soloos_runtime_tables(tmp_path):
     serialized = json.dumps(snapshot, ensure_ascii=False)
 
     assert "/tmp" not in serialized
+    assert "1971680823" not in serialized
+    assert "user:telegram:redacted" in serialized
     assert str(db_path) not in serialized
     assert snapshot["db_path"] == "soloos.sqlite"
 

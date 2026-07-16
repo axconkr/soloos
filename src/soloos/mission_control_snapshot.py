@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import re
 import sqlite3
 import time
 from pathlib import Path
@@ -124,13 +125,22 @@ def _rows(
 
 
 def _sanitize_public_row(row: dict[str, Any]) -> dict[str, Any]:
-    """Remove local filesystem disclosure from browser-facing snapshots."""
+    """Remove local filesystem disclosure and chat identifiers from browser-facing snapshots."""
     for key, value in list(row.items()):
         if not isinstance(value, str):
             continue
         if key in {"file_path", "output_ref", "preview_url"}:
-            row[key] = _public_path_label(value)
+            value = _public_path_label(value)
+        row[key] = _redact_platform_identifiers(value)
     return row
+
+
+def _redact_platform_identifiers(value: str) -> str:
+    value = re.sub(r"(?<=user:telegram:)\d+", "redacted", value)
+    value = re.sub(r"(?<=session:telegram:)\d+", "redacted", value)
+    value = re.sub(r"(?<=command_deck:telegram:)\d+", "redacted", value)
+    value = re.sub(r"(?<![A-Za-z0-9])-100\d{8,}", "telegram-chat-redacted", value)
+    return value
 
 
 def _public_path_label(value: str) -> str:
