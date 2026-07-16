@@ -112,10 +112,8 @@ class ApprovalsService:
         with conn:
             row = conn.execute("SELECT * FROM approvals WHERE id = ?", (approval_id,)).fetchone()
             if row is None:
-                conn.close()
                 raise KeyError(approval_id)
             if row["status"] != "pending":
-                conn.close()
                 raise RuntimeError(f"{approval_id} already {row['status']}")
             conn.execute(
                 "UPDATE approvals SET status=?, decided_at=?, decided_by=?, comment=? WHERE id=?",

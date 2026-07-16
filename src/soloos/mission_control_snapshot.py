@@ -10,7 +10,16 @@ from typing import Any
 
 from .config import get_config
 
-RUNTIME_TABLES = ("agents", "actions", "workflows", "workflow_steps", "approvals", "audit_events")
+RUNTIME_TABLES = (
+    "agents",
+    "agent_templates",
+    "agent_instances",
+    "actions",
+    "workflows",
+    "workflow_steps",
+    "approvals",
+    "audit_events",
+)
 
 
 def export_snapshot(
@@ -30,6 +39,8 @@ def export_snapshot(
         "db_path": Path(db_path).name,
         "counts": {},
         "agents": [],
+        "agent_templates": [],
+        "agent_instances": [],
         "actions": [],
         "workflows": [],
         "workflow_steps": [],
@@ -54,6 +65,25 @@ def export_snapshot(
                FROM agents ORDER BY id LIMIT ?""",
             (limit,),
             json_fields=("authority_json", "kpi_json", "skills_json"),
+        )
+        snapshot["agent_templates"] = _rows(
+            conn,
+            """SELECT id, name, department_agent_id, mission_template,
+                      default_authority_json, default_kpi_json, default_skills_json,
+                      risk_tier, status, created_at, updated_at
+               FROM agent_templates ORDER BY updated_at DESC, id DESC LIMIT ?""",
+            (limit,),
+            json_fields=("default_authority_json", "default_kpi_json", "default_skills_json"),
+        )
+        snapshot["agent_instances"] = _rows(
+            conn,
+            """SELECT id, agent_id, template_id, owner_agent_id, slug, name, mission,
+                      mission_vars_json, capability_set_json, authority_json, kpi_json,
+                      risk_tier, lifecycle_status, policy_status, approval_id, created_by,
+                      created_at, activated_at, updated_at
+               FROM agent_instances ORDER BY updated_at DESC, id DESC LIMIT ?""",
+            (limit,),
+            json_fields=("mission_vars_json", "capability_set_json", "authority_json", "kpi_json"),
         )
         snapshot["actions"] = _rows(
             conn,

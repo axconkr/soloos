@@ -9,6 +9,8 @@ type Snapshot = {
   generated_at?: number;
   counts?: Record<string, number>;
   agents?: RuntimeRow[];
+  agent_templates?: RuntimeRow[];
+  agent_instances?: RuntimeRow[];
   actions?: RuntimeRow[];
   workflows?: RuntimeRow[];
   workflow_steps?: RuntimeRow[];
@@ -190,6 +192,10 @@ export default function Home() {
 
   const counts = snapshot?.counts ?? {};
   const agents = snapshot?.agents?.length ? snapshot.agents : fallbackAgents;
+  const templates = snapshot?.agent_templates ?? [];
+  const factoryInstances = snapshot?.agent_instances ?? [];
+  const pendingFactoryInstances = factoryInstances.filter((instance) => text(instance.policy_status) === "approval_required" || text(instance.lifecycle_status) === "review");
+  const latestFactoryInstance = factoryInstances[0];
   const selectedAgent = agents.find((agent) => text(agent.id) === selectedDepartmentId) ?? agents[0];
   const approvals = approvalItems(snapshot);
   const latestWorkflow = snapshot?.workflows?.[0];
@@ -409,6 +415,37 @@ export default function Home() {
             <div><span>승인 원칙</span><strong>외부 발행·돈·법률·고객 접촉은 대표 승인</strong></div>
           </div>
         </aside>
+      </section>
+
+      <section className="panel agent-factory-board">
+        <div className="section-head">
+          <div>
+            <p className="section-label">Agent Factory / Employee Workbench</p>
+            <h2>직원이 필요한 에이전트를 만들고, 승인 후 회사 실행 레이어에 올립니다.</h2>
+            <p>
+              Mission Control은 결과를 보는 화면이고, 이 레이어는 직원이 업무별 AgentSpec을 만들고
+              권한·KPI·위험도를 붙여 검토 요청하는 SoloOS의 밑바닥입니다.
+            </p>
+          </div>
+          <span className="map-badge">templates {Number(counts.agent_templates ?? templates.length)} · instances {Number(counts.agent_instances ?? factoryInstances.length)}</span>
+        </div>
+        <div className="factory-grid">
+          <article>
+            <span>템플릿</span>
+            <strong>{templates.length ? text(templates[0].name) : "부서별 AgentTemplate 준비"}</strong>
+            <p>{templates.length ? text(templates[0].mission_template) : "역할·미션·기본 권한·KPI를 재사용 가능한 생성 규격으로 관리"}</p>
+          </article>
+          <article>
+            <span>최근 생성 인스턴스</span>
+            <strong>{latestFactoryInstance ? text(latestFactoryInstance.slug) : "아직 생성된 에이전트 없음"}</strong>
+            <p>{latestFactoryInstance ? text(latestFactoryInstance.mission) : "직원이 필요한 순간 생성하고 roster 투입 전까지 draft/review 상태로 격리"}</p>
+          </article>
+          <article>
+            <span>대표 승인 대기</span>
+            <strong>{pendingFactoryInstances.length ? `${pendingFactoryInstances.length}건 approval_required` : "0건"}</strong>
+            <p>외부 접촉·프로덕션·브랜드·비용 권한은 CEO 승인 전 active roster에 들어가지 않습니다.</p>
+          </article>
+        </div>
       </section>
 
       <section className="ceo-grid">

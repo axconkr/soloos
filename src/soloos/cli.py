@@ -10,6 +10,7 @@ from rich.table import Table
 
 from . import __version__
 from .actions import ActionsService
+from .agent_factory import AgentFactoryService
 from .agents import AgentsService
 from .approvals import ApprovalsService
 from .briefing import morning_brief, status_summary
@@ -53,6 +54,8 @@ def db_info() -> None:
     try:
         for name in (
             "agents",
+            "agent_templates",
+            "agent_instances",
             "actions",
             "workflows",
             "workflow_steps",
@@ -292,6 +295,126 @@ def agents_list() -> None:
     for agent in roster:
         t.add_row(agent.id, agent.name, agent.tier, agent.status, ", ".join(agent.skills))
     console.print(t)
+
+
+# ─── agent factory ──────────────────────────────────────
+@main.group(name="agent-factory")
+def agent_factory_group() -> None:
+    """Employee Workbench commands for creating governed agents."""
+
+
+@agent_factory_group.command("create-template")
+@click.argument("template_id")
+@click.option("--name", required=True)
+@click.option("--department", required=True, help="Owning department roster agent id, e.g. agent:cto")
+@click.option("--mission-template", required=True)
+@click.option("--skill", "skills", multiple=True, help="Default skill; repeatable")
+@click.option("--authority", default="{}", help="Default authority JSON")
+@click.option("--kpi", default="{}", help="Default KPI JSON")
+@click.option("--risk-tier", type=click.Choice(["LOW", "MED", "HIGH"]), default="MED")
+def agent_factory_create_template(
+    template_id: str,
+    name: str,
+    department: str,
+    mission_template: str,
+    skills: tuple[str, ...],
+    authority: str,
+    kpi: str,
+    risk_tier: str,
+) -> None:
+    template = AgentFactoryService().create_template(
+        template_id=template_id,
+        name=name,
+        department=department,
+        mission_template=mission_template,
+        default_skills=list(skills),
+        default_authority=json.loads(authority),
+        default_kpi=json.loads(kpi),
+        risk_tier=risk_tier,
+    )
+    console.print(
+        f"template={template.id} department={template.department_agent_id} "
+        f"status={template.status} risk={template.risk_tier}"
+    )
+
+
+@agent_factory_group.command("create")
+@click.argument("template_id")
+@click.option("--owner-agent", required=True, help="Owning roster agent id, e.g. agent:cto")
+@click.option("--slug", required=True, help="generated agent slug, e.g. market-researcher-q3")
+@click.option("--var", "vars_", multiple=True, help="mission variable as key=value; repeatable")
+@click.option("--created-by", default="employee:unknown")
+def agent_factory_create(
+    template_id: str,
+    owner_agent: str,
+    slug: str,
+    vars_: tuple[str, ...],
+    created_by: str,
+) -> None:
+    mission_vars = _parse_key_value_options(vars_)
+    instance = AgentFactoryService().create_instance(
+        template_id=template_id,
+        owner_agent_id=owner_agent,
+        slug=slug,
+        mission_vars=mission_vars,
+        created_by=created_by,
+    )
+    console.print(
+        f"instance={instance.id} agent={instance.agent_id} "
+        f"status={instance.lifecycle_status} policy={instance.policy_status}"
+    )
+
+
+@agent_factory_group.command("request-activation")
+@click.argument("instance_id")
+@click.option("--requested-by", default="employee:unknown")
+def agent_factory_request_activation(instance_id: str, requested_by: str) -> None:
+    gate = AgentFactoryService().request_activation(instance_id, requested_by=requested_by)
+    console.print(
+        f"instance={gate.instance_id} status={gate.status} "
+        f"approval={gate.approval_id or '-'} policy={gate.policy_rule} risk={gate.risk}"
+    )
+
+
+@agent_factory_group.command("activate")
+@click.argument("instance_id")
+@click.option("--approval", "approval_id", required=True)
+@click.option("--activated-by", default="employee:unknown")
+def agent_factory_activate(instance_id: str, approval_id: str, activated_by: str) -> None:
+    instance = AgentFactoryService().activate(instance_id, approval_id=approval_id, activated_by=activated_by)
+    console.print(f"instance={instance.id} agent={instance.agent_id} status={instance.lifecycle_status}")
+
+
+@agent_factory_group.command("list")
+@click.option("--limit", default=50, type=int)
+def agent_factory_list(limit: int) -> None:
+    rows = AgentFactoryService().list_instances(limit=limit)
+    if not rows:
+        console.print("[green]agent factory instance 없음.[/green]")
+        return
+    t = Table(title=f"Agent Factory ({len(rows)})")
+    for col in ("instance", "agent", "template", "owner", "status", "policy"):
+        t.add_column(col)
+    for row in rows:
+        t.add_row(row.id, row.agent_id, row.template_id, row.owner_agent_id, row.lifecycle_status, row.policy_status)
+    console.print(t)
+    for row in rows:
+        console.print(
+            f"slug={row.slug} instance={row.id} agent={row.agent_id} "
+            f"status={row.lifecycle_status} policy={row.policy_status}"
+        )
+
+
+def _parse_key_value_options(items: tuple[str, ...]) -> dict[str, str]:
+    parsed: dict[str, str] = {}
+    for item in items:
+        if "=" not in item:
+            raise click.BadParameter("--var must be key=value")
+        key, value = item.split("=", 1)
+        if not key:
+            raise click.BadParameter("--var key cannot be empty")
+        parsed[key] = value
+    return parsed
 
 
 # ─── workflows ──────────────────────────────────────────
