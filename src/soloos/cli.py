@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from pathlib import Path
 
 import click
@@ -182,6 +183,25 @@ def mission_control_export_snapshot(output_path: str, limit: int) -> None:
         f"snapshot={output_path} agents={snapshot['counts'].get('agents', 0)} "
         f"actions={snapshot['counts'].get('actions', 0)} approvals={snapshot['counts'].get('approvals', 0)}"
     )
+
+
+@mission_control_group.command("deploy-readiness")
+@click.option("--target-url", default="not_deployed", help="Preview/production URL being evaluated; do not deploy from this command.")
+def mission_control_deploy_readiness(target_url: str) -> None:
+    """Print a secret-safe hosted deployment readiness report."""
+    require_auth = os.getenv("SOLOOS_REQUIRE_WEB_AUTH") == "1" or bool(os.getenv("SOLOOS_MISSION_CONTROL_URL"))
+    status = {
+        "target_url": target_url,
+        "runtime_url": os.getenv("SOLOOS_MISSION_CONTROL_URL") or "missing",
+        "web_auth": "enabled" if require_auth else "disabled",
+        "basic_user": "set" if os.getenv("SOLOOS_WEB_BASIC_USER") else "missing",
+        "basic_password": "set" if os.getenv("SOLOOS_WEB_BASIC_PASSWORD") else "missing",
+        "api_token": "set" if os.getenv("SOLOOS_WEB_API_TOKEN") else "missing",
+        "brand_asset": "blocker",
+        "production_deploy": "blocked_until_ceo_approval",
+    }
+    for key, value in status.items():
+        console.print(f"{key}={value}")
 
 
 @mission_control_group.command("ask")

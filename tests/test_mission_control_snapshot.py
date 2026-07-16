@@ -267,3 +267,29 @@ def test_mission_control_cli_exports_snapshot(tmp_path, monkeypatch):
     assert exported["counts"]["agents"] >= 1
 
     cfg_mod.reset_config()
+
+
+def test_mission_control_deploy_readiness_reports_auth_without_leaking_secrets(monkeypatch):
+    from click.testing import CliRunner
+
+    from soloos.cli import main
+
+    monkeypatch.setenv("SOLOOS_REQUIRE_WEB_AUTH", "1")
+    monkeypatch.setenv("SOLOOS_WEB_BASIC_USER", "ceo")
+    monkeypatch.setenv("SOLOOS_WEB_BASIC_PASSWORD", "super-secret-password")
+    monkeypatch.setenv("SOLOOS_WEB_API_TOKEN", "api-token-secret")
+    monkeypatch.setenv("SOLOOS_MISSION_CONTROL_URL", "https://soloos-runtime.example.com")
+
+    result = CliRunner().invoke(main, ["mission-control", "deploy-readiness", "--target-url", "https://preview.example.com"])
+
+    assert result.exit_code == 0, result.output
+    assert "target_url=https://preview.example.com" in result.output
+    assert "runtime_url=https://soloos-runtime.example.com" in result.output
+    assert "web_auth=enabled" in result.output
+    assert "basic_user=set" in result.output
+    assert "basic_password=set" in result.output
+    assert "api_token=set" in result.output
+    assert "brand_asset=blocker" in result.output
+    assert "production_deploy=blocked_until_ceo_approval" in result.output
+    assert "super-secret-password" not in result.output
+    assert "api-token-secret" not in result.output

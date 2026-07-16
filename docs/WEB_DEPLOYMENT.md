@@ -103,6 +103,18 @@ cd ../..
 uv run pytest -q
 ```
 
+Before reporting a hosted target, generate a secret-safe readiness line. It reports whether auth/runtime variables are present without printing secret values and always keeps production blocked until CEO approval:
+
+```bash
+soloos mission-control deploy-readiness --target-url https://<preview-or-production-url>
+```
+
+Expected production guard line:
+
+```text
+production_deploy=blocked_until_ceo_approval
+```
+
 For local smoke testing:
 
 ```bash

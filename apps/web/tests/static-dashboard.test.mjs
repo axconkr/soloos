@@ -127,6 +127,8 @@ const expectations = [
   ['OpenManus analysis Korean cockpit translation', openManusAnalysis, '한국어 CEO cockpit에 맞게 변환할 항목'],
   ['OpenManus no direct clone statement', openManusAnalysis, '직접 복제하지 않는다'],
   ['deployment doc branding blocker', webDeployment, 'TODO: brand asset required'],
+  ['deployment readiness command docs', webDeployment, 'soloos mission-control deploy-readiness'],
+  ['deployment production guard docs', webDeployment, 'production_deploy=blocked_until_ceo_approval'],
   ['README branding blocker', readme, 'TODO: brand asset required'],
 ];
 
