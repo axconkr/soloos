@@ -26,7 +26,7 @@ def export_snapshot(
 
     snapshot: dict[str, Any] = {
         "generated_at": int(time.time()),
-        "db_path": str(Path(db_path).resolve()),
+        "db_path": Path(db_path).name,
         "counts": {},
         "agents": [],
         "actions": [],
@@ -120,7 +120,25 @@ def _rows(
         rows = conn.execute(sql, params).fetchall()
     except sqlite3.Error:
         return []
-    return [_decode_json_fields(dict(row), json_fields) for row in rows]
+    return [_sanitize_public_row(_decode_json_fields(dict(row), json_fields)) for row in rows]
+
+
+def _sanitize_public_row(row: dict[str, Any]) -> dict[str, Any]:
+    """Remove local filesystem disclosure from browser-facing snapshots."""
+    for key, value in list(row.items()):
+        if not isinstance(value, str):
+            continue
+        if key in {"file_path", "output_ref", "preview_url"}:
+            row[key] = _public_path_label(value)
+    return row
+
+
+def _public_path_label(value: str) -> str:
+    if value.startswith("file://"):
+        return f"file://{Path(value.removeprefix('file://')).name}"
+    if value.startswith("/"):
+        return Path(value).name
+    return value
 
 
 def _decode_json_fields(row: dict[str, Any], fields: tuple[str, ...]) -> dict[str, Any]:

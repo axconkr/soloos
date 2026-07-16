@@ -154,6 +154,11 @@ def test_export_mission_control_snapshot_reads_soloos_runtime_tables(tmp_path):
     conn.close()
 
     snapshot = export_snapshot(db_path=db_path, out_path=out_path)
+    serialized = json.dumps(snapshot, ensure_ascii=False)
+
+    assert "/tmp" not in serialized
+    assert str(db_path) not in serialized
+    assert snapshot["db_path"] == "soloos.sqlite"
 
     assert snapshot["counts"] == {
         "agents": 1,
@@ -166,6 +171,7 @@ def test_export_mission_control_snapshot_reads_soloos_runtime_tables(tmp_path):
     assert snapshot["agents"][0]["name"] == "Growth / Marketing"
     assert snapshot["actions"][0]["snapshot_ref"] == "workflow://WF-0001"
     assert snapshot["workflows"][0]["status"] == "success"
-    assert snapshot["workflow_steps"][0]["output_ref"] == "file:///tmp/WS-0001.md"
-    assert snapshot["audit_events"][0]["id"] == "STEP-WS-0001"
+    assert snapshot["workflow_steps"][0]["output_ref"] == "file://WS-0001.md"
+    assert snapshot["approvals"][0]["preview_url"] == "file://preview.html"
+    assert snapshot["audit_events"][0]["file_path"] == "audit.jsonl"
     assert json.loads(out_path.read_text())["generated_at"]

@@ -1,13 +1,13 @@
 {
-  "generated_at": 1784181830,
-  "db_path": "/home/user/projects/ai-native-company/soloos/data/soloos.sqlite",
+  "generated_at": 1784182687,
+  "db_path": "soloos.sqlite",
   "counts": {
     "agents": 7,
     "actions": 8,
     "workflows": 1,
     "workflow_steps": 1,
-    "approvals": 6,
-    "audit_events": 24
+    "approvals": 7,
+    "audit_events": 29
   },
   "agents": [
     {
@@ -17,7 +17,7 @@
       "tier": "reasoning",
       "tone": "blunt, CEO-readable, evidence-first",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_request_clarification": true,
         "can_set_priorities": false,
@@ -41,7 +41,7 @@
       "tier": "reasoning",
       "tone": "conservative, exact, risk-aware",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_file_taxes": false,
         "can_move_money": false,
@@ -65,7 +65,7 @@
       "tier": "reasoning",
       "tone": "technical, test-driven, concise",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_create_local_files": true,
         "can_deploy_production": false,
@@ -91,7 +91,7 @@
       "tier": "reasoning",
       "tone": "tasteful, concrete, conversion-aware",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_change_public_brand": false,
         "can_generate_designs": true,
@@ -115,7 +115,7 @@
       "tier": "reasoning",
       "tone": "careful, non-lawyer, risk-focused",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_provide_final_legal_advice": false,
         "can_review_contracts": true,
@@ -139,7 +139,7 @@
       "tier": "reasoning",
       "tone": "sharp, practical, market-aware",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_draft_public_content": true,
         "can_publish": false,
@@ -164,7 +164,7 @@
       "tier": "bulk",
       "tone": "systematic, operational, terse",
       "status": "active",
-      "updated_at": 1784181830,
+      "updated_at": 1784182687,
       "authority": {
         "can_change_production": false,
         "can_run_local_automation": true,
@@ -362,7 +362,7 @@
       "status": "success",
       "created_at": 1783057929,
       "completed_at": 1783057937,
-      "output_ref": "file:///home/user/projects/ai-native-company/soloos/data/workspace/content/WF-0001/WS-0001.md",
+      "output_ref": "file://WS-0001.md",
       "output_text": "OpenRouter draft written: Blog draft 1 (blog)",
       "params": {
         "period": "this_week",
@@ -373,6 +373,23 @@
     }
   ],
   "approvals": [
+    {
+      "id": "AP-0007",
+      "created_at": 1784182679,
+      "agent_id": "agent:growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/smoke",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "pending",
+      "decided_at": null,
+      "decided_by": null,
+      "comment": null,
+      "audit_id": null,
+      "params": {}
+    },
     {
       "id": "AP-0006",
       "created_at": 1784172410,
@@ -483,6 +500,71 @@
   ],
   "audit_events": [
     {
+      "id": "A-0036",
+      "ts": 1784182687,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 6053,
+      "content_hash": "sha256:c97802311a486e8d"
+    },
+    {
+      "id": "A-0035",
+      "ts": 1784182679,
+      "actor": "agent:agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0007",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5757,
+      "content_hash": "sha256:1b0e7d7618f0c641"
+    },
+    {
+      "id": "A-0034",
+      "ts": 1784182668,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5428,
+      "content_hash": "sha256:77210308bbdd9c46"
+    },
+    {
+      "id": "A-0033",
+      "ts": 1784182667,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5093,
+      "content_hash": "sha256:738ae2ccb1e15019"
+    },
+    {
+      "id": "A-0032",
+      "ts": 1784182434,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 4764,
+      "content_hash": "sha256:d73b468c3dc98494"
+    },
+    {
       "id": "A-0031",
       "ts": 1784181830,
       "actor": "user:web:ceo",
@@ -491,7 +573,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 4425,
       "content_hash": "sha256:20428bc7ca0bea0d"
     },
@@ -504,7 +586,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 4083,
       "content_hash": "sha256:d6b1464262bc5e61"
     },
@@ -517,7 +599,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 3741,
       "content_hash": "sha256:d0480289ed1c2bd7"
     },
@@ -530,7 +612,7 @@
       "status": "success",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 3452,
       "content_hash": "sha256:253212a7c9849e1b"
     },
@@ -543,7 +625,7 @@
       "status": "pending",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 3138,
       "content_hash": "sha256:97cab27fd76d4fb4"
     },
@@ -556,7 +638,7 @@
       "status": "success",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 2846,
       "content_hash": "sha256:46c4863c8662fc00"
     },
@@ -569,7 +651,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 2504,
       "content_hash": "sha256:9c56476a77870631"
     },
@@ -582,7 +664,7 @@
       "status": "pending",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 2195,
       "content_hash": "sha256:35f45cebf622f08b"
     },
@@ -595,7 +677,7 @@
       "status": "success",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 1912,
       "content_hash": "sha256:c231d66591f34cf5"
     },
@@ -608,7 +690,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 1570,
       "content_hash": "sha256:92d34a09687dd826"
     },
@@ -621,7 +703,7 @@
       "status": "pending",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 1262,
       "content_hash": "sha256:3ed1749d226b1ca5"
     },
@@ -634,7 +716,7 @@
       "status": "success",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 990,
       "content_hash": "sha256:e5868eabfcb744f8"
     },
@@ -647,7 +729,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 648,
       "content_hash": "sha256:bb387f2f8ef24d2d"
     },
@@ -660,7 +742,7 @@
       "status": "pending",
       "policy_rule": "default",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 342,
       "content_hash": "sha256:b1d946f4f6293edb"
     },
@@ -673,7 +755,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-16.jsonl",
+      "file_path": "2026-07-16.jsonl",
       "line_offset": 0,
       "content_hash": "sha256:82d26b1c36815c77"
     },
@@ -686,7 +768,7 @@
       "status": "success",
       "policy_rule": null,
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "file_path": "2026-07-03.jsonl",
       "line_offset": 747,
       "content_hash": "sha256:3ab6abc63617fc21"
     },
@@ -699,7 +781,7 @@
       "status": "success",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "file_path": "2026-07-03.jsonl",
       "line_offset": 363,
       "content_hash": "sha256:5e606bc4004c10c8"
     },
@@ -712,7 +794,7 @@
       "status": "routed",
       "policy_rule": "command_deck:local_classifier",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-03.jsonl",
+      "file_path": "2026-07-03.jsonl",
       "line_offset": 0,
       "content_hash": "sha256:6c6f94c89ff90959"
     },
@@ -725,7 +807,7 @@
       "status": "success",
       "policy_rule": "guardrail:two_key_5M",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "file_path": "2026-07-01.jsonl",
       "line_offset": 1345,
       "content_hash": "sha256:5c6b52b975a21cac"
     },
@@ -738,61 +820,9 @@
       "status": "success",
       "policy_rule": "content_publish",
       "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
+      "file_path": "2026-07-01.jsonl",
       "line_offset": 1081,
       "content_hash": "sha256:f21dacfc10ac493f"
-    },
-    {
-      "id": "A-0004",
-      "ts": 1782902250,
-      "actor": "agent:finance",
-      "action_type": "request_approval",
-      "target": "approval:AP-0002",
-      "status": "pending",
-      "policy_rule": "guardrail:two_key_5M",
-      "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
-      "line_offset": 793,
-      "content_hash": "sha256:0930241e84f4a1e8"
-    },
-    {
-      "id": "A-0003",
-      "ts": 1782902249,
-      "actor": "agent:ops",
-      "action_type": "delete",
-      "target": "db:prod",
-      "status": "deny",
-      "policy_rule": "no_prod_delete",
-      "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
-      "line_offset": 542,
-      "content_hash": "sha256:b94ee87c2e353740"
-    },
-    {
-      "id": "A-0002",
-      "ts": 1782902249,
-      "actor": "agent:cmo",
-      "action_type": "request_approval",
-      "target": "approval:AP-0001",
-      "status": "pending",
-      "policy_rule": "content_publish",
-      "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
-      "line_offset": 262,
-      "content_hash": "sha256:c71568bdcf707f64"
-    },
-    {
-      "id": "A-0001",
-      "ts": 1782902249,
-      "actor": "agent:cmo",
-      "action_type": "draft_content",
-      "target": "blog:hello",
-      "status": "auto",
-      "policy_rule": "internal_drafts",
-      "cost_krw": 0,
-      "file_path": "/home/user/projects/ai-native-company/soloos/data/audit/2026-07-01.jsonl",
-      "line_offset": 0,
-      "content_hash": "sha256:b251343a7316b92e"
     }
   ]
 }

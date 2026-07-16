@@ -134,4 +134,8 @@ if (!packageJson.scripts?.build?.includes('NODE_ENV=production')) {
   throw new Error('Build script must force NODE_ENV=production so Next middleware is not emitted with eval');
 }
 
+if (missionClient.includes('snapshot_path: SNAPSHOT_PATH')) {
+  throw new Error('Mission Control API responses must not expose local SNAPSHOT_PATH');
+}
+
 console.log('static dashboard contract ok');

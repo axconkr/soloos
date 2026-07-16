@@ -81,11 +81,11 @@ async function postRemote(path: string, body: MissionControlEvent) {
 
 export async function askMissionControl(command: string, source: string, baseEvent: MissionControlEvent) {
   if (SOLOOS_API_URL) {
-    const remote = await postRemote("/mission-control/ask", { command, source, snapshot_path: SNAPSHOT_PATH });
+    const remote = await postRemote("/mission-control/ask", { command, source, snapshot_path: "soloos-snapshot.json" });
     return {
       ...baseEvent,
       ...remote,
-      snapshot_path: remote.snapshot_path ?? SNAPSHOT_PATH,
+      snapshot_path: remote.snapshot_path ? "remote_snapshot" : "soloos-snapshot.json",
       status: "routed_to_soloos_remote",
     };
   }
@@ -102,7 +102,7 @@ export async function askMissionControl(command: string, source: string, baseEve
   return {
     ...baseEvent,
     ...parseCliFields(stdout),
-    snapshot_path: SNAPSHOT_PATH,
+    snapshot_path: "soloos-snapshot.json",
     local_warning: stderr.trim() ? "soloos_cli_wrote_stderr" : undefined,
     status: "routed_to_soloos",
   };
@@ -121,13 +121,13 @@ export async function decideMissionControl(
       verdict,
       by: "ceo:web",
       comment: note || decision,
-      snapshot_path: SNAPSHOT_PATH,
+      snapshot_path: "soloos-snapshot.json",
     });
     return {
       ...baseEvent,
       ...remote,
       approval_id: remote.approval_id ?? approvalId,
-      snapshot_path: remote.snapshot_path ?? SNAPSHOT_PATH,
+      snapshot_path: remote.snapshot_path ? "remote_snapshot" : "soloos-snapshot.json",
       status: "recorded_in_soloos_remote",
     };
   }
@@ -158,7 +158,7 @@ export async function decideMissionControl(
     ...baseEvent,
     ...parseCliFields(stdout),
     approval_id: approvalId,
-    snapshot_path: SNAPSHOT_PATH,
+    snapshot_path: "soloos-snapshot.json",
     local_warning: stderr.trim() ? "soloos_cli_wrote_stderr" : undefined,
     status: "recorded_in_soloos",
   };
