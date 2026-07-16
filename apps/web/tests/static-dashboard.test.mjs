@@ -30,6 +30,7 @@ const approvalRoute = readFileSync(join(root, 'app/api/approval-decision/route.t
 const missionClient = readFileSync(join(root, 'lib/mission-control-client.ts'), 'utf8');
 const apiGuard = readFileSync(join(root, 'lib/api-guard.ts'), 'utf8');
 const middleware = readFileSync(join(root, 'middleware.ts'), 'utf8');
+const packageJson = JSON.parse(readFileSync(join(root, 'package.json'), 'utf8'));
 const repoRoot = join(root, '..', '..');
 const openManusAnalysisPath = join(repoRoot, 'docs/OPENMANUS_REFERENCE_ANALYSIS.md');
 if (!existsSync(openManusAnalysisPath)) {
@@ -127,6 +128,10 @@ for (const [label, source, needle] of expectations) {
   if (!source.includes(needle)) {
     throw new Error(`Missing ${label}: ${needle}`);
   }
+}
+
+if (!packageJson.scripts?.build?.includes('NODE_ENV=production')) {
+  throw new Error('Build script must force NODE_ENV=production so Next middleware is not emitted with eval');
 }
 
 console.log('static dashboard contract ok');

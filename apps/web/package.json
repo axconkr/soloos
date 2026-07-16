@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev --hostname 0.0.0.0",
-    "build": "next build",
+    "build": "NODE_ENV=production next build",
     "start": "next start --hostname 0.0.0.0",
     "lint": "next lint",
     "test:static": "node tests/static-dashboard.test.mjs",
