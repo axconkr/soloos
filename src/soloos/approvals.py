@@ -78,6 +78,7 @@ class ApprovalsService:
         # enqueue approval
         ap_id = next_id("AP")
         now = int(time.time())
+        approval_params = dict(params or {})
         conn = connect()
         with conn:
             conn.execute(
@@ -87,7 +88,7 @@ class ApprovalsService:
                 VALUES (?,?,?,?,?,?,?,?,?,?,?)""",
                 (ap_id, now, agent_id, action_type, target, preview_url,
                  cost_krw, verdict.risk, verdict.rule_id, "pending",
-                 json.dumps(params or {}, ensure_ascii=False)),
+                 json.dumps(approval_params, ensure_ascii=False)),
             )
         conn.close()
 
@@ -101,6 +102,7 @@ class ApprovalsService:
             cost_krw=cost_krw,
             extras={"target": target, "risk": verdict.risk},
         )
+        self._deliver_telegram_card(ap_id)
         return verdict, ap_id
 
     # ──────────── Decision path ────────────
@@ -112,10 +114,8 @@ class ApprovalsService:
         with conn:
             row = conn.execute("SELECT * FROM approvals WHERE id = ?", (approval_id,)).fetchone()
             if row is None:
-                conn.close()
                 raise KeyError(approval_id)
             if row["status"] != "pending":
-                conn.close()
                 raise RuntimeError(f"{approval_id} already {row['status']}")
             conn.execute(
                 "UPDATE approvals SET status=?, decided_at=?, decided_by=?, comment=? WHERE id=?",
@@ -135,6 +135,43 @@ class ApprovalsService:
             extras={"comment": comment},
         )
         return _row_to_record(row)
+
+    def _deliver_telegram_card(self, approval_id: str) -> None:
+        """Best-effort Telegram card delivery; approval creation must not fail if Telegram is down."""
+        record = self.get(approval_id)
+        if record is None:
+            return
+        try:
+            from .telegram_approvals import send_approval_card
+
+            result = send_approval_card(record)
+            params = dict(record.params)
+            params["telegram"] = {
+                "decision_surface": "primary",
+                "delivery_status": result.delivery_status,
+                "chat_ref": result.chat_ref,
+                "message_ref": result.message_ref,
+                "sent_at": int(time.time()),
+            }
+            conn = connect()
+            try:
+                with conn:
+                    conn.execute(
+                        "UPDATE approvals SET params_json=? WHERE id=?",
+                        (json.dumps(params, ensure_ascii=False), approval_id),
+                    )
+            finally:
+                conn.close()
+        except Exception as exc:  # noqa: BLE001 - approval enqueue must be durable even if Telegram fails.
+            audit.emit(
+                id=next_id("A"),
+                actor="system:soloos",
+                action_type="telegram_approval_card_failed",
+                target=f"approval:{approval_id}",
+                status="failed",
+                extras={"error": type(exc).__name__},
+            )
+
 
     # ──────────── Query ────────────
     def list_pending(self, limit: int = 50) -> list[ApprovalRecord]:

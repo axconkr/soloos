@@ -17,11 +17,11 @@ rules:
     verdict: deny
 
   # ─── ESCALATE ────────────────────────────────────────
-  - id: cmo_overbudget
-    when: "actor == 'agent:cmo' and action.type == 'spend_money' and params.amount_krw > 500000"
+  - id: growth_overbudget
+    when: "actor == 'agent:growth' and action.type == 'spend_money' and params.amount_krw > 500000"
     verdict: escalate
-    to: agent:finance
-    reason: "Marketing spend over 500k → Finance review first"
+    to: agent:cfo
+    reason: "Growth spend over 500k → Finance review first"
 
   # ─── APPROVAL (default for risk classes) ─────────────
   - id: money_out

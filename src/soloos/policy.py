@@ -1,6 +1,17 @@
-"""Policy Engine: rule evaluation → verdict {auto, approval, deny, escalate}."""
+"""Policy Engine: rule evaluation → verdict {auto, approval, deny, escalate}.
+
+Design:
+- Rules evaluated top-to-bottom, first match wins.
+- Expressions parsed by simpleeval (safe subset).
+- Rule expression *syntax* errors are surfaced (logged as ERROR) so YAML
+  typos don't silently ignore rules.
+- Rule *runtime* errors (missing keys against a valid context) are logged
+  DEBUG and treated as no-match — allows optional context keys.
+"""
 from __future__ import annotations
 
+import logging
+import os
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -8,11 +19,16 @@ from typing import Any
 import yaml
 from simpleeval import EvalWithCompoundTypes, InvalidExpression
 
+log = logging.getLogger(__name__)
+
 VERDICTS = {"auto", "approval", "deny", "escalate"}
-import os
 
 _ENV_POL = os.getenv("SOLOOS_POLICY_FILE")
-POLICY_FILE = Path(_ENV_POL) if _ENV_POL else Path(__file__).resolve().parents[2] / "policy" / "rules.yaml"
+POLICY_FILE = (
+    Path(_ENV_POL) if _ENV_POL else Path(__file__).resolve().parents[2] / "policy" / "rules.yaml"
+)
+
+HARD_GUARDRAIL_KRW = 5_000_000
 
 
 @dataclass
@@ -25,6 +41,10 @@ class Verdict:
     escalate_to: str | None = None
 
 
+class PolicyRuleError(ValueError):
+    """Raised when a policy rule expression is invalid and cannot be trusted."""
+
+
 class PolicyEngine:
     def __init__(self, rules_path: Path = POLICY_FILE):
         self.rules_path = rules_path
@@ -34,24 +54,42 @@ class PolicyEngine:
 
     def load(self) -> None:
         if not self.rules_path.exists():
+            log.warning("policy file not found: %s", self.rules_path)
             self.rules = []
             return
         with self.rules_path.open("r", encoding="utf-8") as f:
             doc = yaml.safe_load(f) or {}
-        self.rules = doc.get("rules", [])
+        rules = doc.get("rules", [])
+        # Validate rule shapes at load time (fail fast on typos).
+        for r in rules:
+            if not isinstance(r, dict):
+                raise ValueError(f"policy rule not a mapping: {r!r}")
+            if "id" not in r:
+                raise ValueError(f"policy rule missing 'id': {r!r}")
+            v = r.get("verdict")
+            if v not in VERDICTS:
+                raise ValueError(f"policy rule {r['id']} has invalid verdict: {v!r}")
+        self.rules = rules
         self.default_verdict = doc.get("default_verdict", "approval")
 
     def evaluate(self, context: dict[str, Any]) -> Verdict:
-        """Apply rules top-to-bottom; first match wins."""
-        # Hard guardrail: >5M KRW spend always requires approval regardless of rules
+        """Apply rules top-to-bottom; first match wins.
+
+        Hard guardrail: any amount_krw > HARD_GUARDRAIL_KRW forces approval
+        regardless of matched rule (§Policy Engine §5.1 hardcoded).
+        """
         params = context.get("params") or {}
         try:
             amt = int(params.get("amount_krw", 0) or 0)
         except (TypeError, ValueError):
             amt = 0
-        if amt > 5_000_000:
-            return Verdict("approval", "guardrail:two_key_5M", risk="HIGH",
-                           reason="Amount over ₩5,000,000 requires CEO approval by hard rule.")
+        if amt > HARD_GUARDRAIL_KRW:
+            return Verdict(
+                "approval",
+                "guardrail:two_key_5M",
+                risk="HIGH",
+                reason=f"Amount ₩{amt:,} exceeds ₩{HARD_GUARDRAIL_KRW:,} hard rule.",
+            )
 
         evaluator = EvalWithCompoundTypes(names=_flatten(context))
         for rule in self.rules:
@@ -59,25 +97,39 @@ class PolicyEngine:
             if not expr:
                 continue
             try:
-                if not evaluator.eval(expr):
-                    continue
-            except (InvalidExpression, Exception):  # noqa: BLE001
+                matched = bool(evaluator.eval(expr))
+            except (InvalidExpression, SyntaxError) as exc:
+                log.error(
+                    "policy rule %s expression invalid: %s (%s)",
+                    rule.get("id"), expr, exc,
+                )
+                raise PolicyRuleError(
+                    f"policy rule {rule.get('id')} expression invalid: {expr!r}"
+                ) from exc
+            except (NameError, KeyError, AttributeError, TypeError) as exc:
+                log.debug(
+                    "policy rule %s did not match (missing ctx): %s",
+                    rule.get("id"), exc,
+                )
                 continue
-            # exempt_if allows immediate downgrade to auto
+            if not matched:
+                continue
+
             exempt = rule.get("exempt_if")
             if exempt:
                 try:
-                    if evaluator.eval(exempt):
-                        return Verdict("auto", rule.get("id", "?"), reason="exempt_if matched",
-                                       risk=rule.get("risk", "LOW"))
-                except Exception:  # noqa: BLE001
-                    pass
-            verdict = rule.get("verdict", self.default_verdict)
-            if verdict not in VERDICTS:
-                verdict = self.default_verdict
+                    if bool(evaluator.eval(exempt)):
+                        return Verdict(
+                            "auto", rule["id"],
+                            reason="exempt_if matched",
+                            risk=rule.get("risk", "LOW"),
+                        )
+                except Exception as exc:  # noqa: BLE001
+                    log.debug("exempt_if eval failed for %s: %s", rule["id"], exc)
+
             return Verdict(
-                verdict=verdict,
-                rule_id=rule.get("id", "?"),
+                verdict=rule["verdict"],
+                rule_id=rule["id"],
                 reason=rule.get("reason", ""),
                 risk=rule.get("risk", "LOW"),
                 template=rule.get("template"),
@@ -87,17 +139,19 @@ class PolicyEngine:
 
 
 def _flatten(ctx: dict[str, Any]) -> dict[str, Any]:
-    """Expose top-level keys AND their sub-dicts as attribute-accessible names."""
-    out: dict[str, Any] = {}
-    for k, v in ctx.items():
-        out[k] = _AttrDict(v) if isinstance(v, dict) else v
-    return out
+    return {k: _wrap(v) for k, v in ctx.items()}
+
+
+def _wrap(v: Any) -> Any:
+    if isinstance(v, dict):
+        return _AttrDict({k: _wrap(sub) for k, sub in v.items()})
+    return v
 
 
 class _AttrDict(dict):
-    """Dict with attribute access for simpleeval expressions like `action.type`."""
+    """Dict with attribute access for expressions like `action.type`."""
+
     def __getattr__(self, key: str) -> Any:
-        v = self.get(key)
-        if isinstance(v, dict):
-            return _AttrDict(v)
-        return v
+        if key.startswith("_"):
+            raise AttributeError(key)
+        return self.get(key)

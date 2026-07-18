@@ -1,0 +1,29 @@
+{
+  "name": "@soloos/web",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "next dev --hostname 0.0.0.0",
+    "build": "NODE_ENV=production next build",
+    "start": "next start --hostname 0.0.0.0",
+    "lint": "next lint",
+    "test:static": "node tests/static-dashboard.test.mjs",
+    "verify": "npm run test:static && npm run build"
+  },
+  "dependencies": {
+    "@next/env": "15.5.20",
+    "next": "15.5.20",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "22.10.2",
+    "@types/react": "19.0.8",
+    "@types/react-dom": "19.0.3",
+    "typescript": "5.7.2"
+  },
+  "overrides": {
+    "postcss": "8.5.10"
+  }
+}

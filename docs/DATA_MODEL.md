@@ -52,7 +52,7 @@ CREATE TABLE users (
 ### 2.2 agents
 ```sql
 CREATE TABLE agents (
-  id TEXT PRIMARY KEY,          -- 'cmo', 'sales', ...
+  id TEXT PRIMARY KEY,          -- 'agent:cmo', 'agent:sales', ...
   name TEXT NOT NULL,
   mission TEXT,
   tier TEXT CHECK(tier IN ('reasoning','bulk')) NOT NULL,
@@ -90,10 +90,47 @@ CREATE INDEX idx_actions_actor ON actions(actor);
 CREATE INDEX idx_actions_status ON actions(status);
 ```
 
-### 2.4 approvals
+### 2.4 workflows / workflow_steps
+```sql
+CREATE TABLE workflows (
+  id TEXT PRIMARY KEY,          -- 'WF-0001'
+  created_at INTEGER NOT NULL,
+  updated_at INTEGER NOT NULL,
+  source_action_id TEXT,        -- actions.id that created the workflow
+  actor TEXT NOT NULL,          -- 'agent:cmo'
+  workflow_type TEXT NOT NULL,  -- content_plan, sales_followup, ...
+  title TEXT,
+  params_json TEXT,
+  status TEXT CHECK(status IN ('pending','running','success','failed','cancelled')) DEFAULT 'pending'
+);
+CREATE INDEX idx_workflows_status ON workflows(status);
+CREATE INDEX idx_workflows_source_action ON workflows(source_action_id);
+
+CREATE TABLE workflow_steps (
+  id TEXT PRIMARY KEY,          -- 'WS-0001'
+  workflow_id TEXT NOT NULL,
+  step_order INTEGER NOT NULL,
+  actor TEXT NOT NULL,
+  action_type TEXT NOT NULL,    -- draft_content, research_lead, ...
+  target TEXT,
+  params_json TEXT,
+  status TEXT CHECK(status IN ('pending','running','success','failed','skipped')) DEFAULT 'pending',
+  created_at INTEGER NOT NULL,
+  completed_at INTEGER,
+  output_ref TEXT,              -- file:///.../data/workspace/content/WF-0001/WS-0001.md
+  output_text TEXT,             -- short executor summary for CLI/table display
+  FOREIGN KEY (workflow_id) REFERENCES workflows(id)
+);
+CREATE INDEX idx_workflow_steps_workflow ON workflow_steps(workflow_id, step_order);
+CREATE INDEX idx_workflow_steps_status ON workflow_steps(status);
+```
+
+MVP behavior: `agent:cmo/content_plan` creates one workflow with N `draft_content` pending steps and stores `actions.snapshot_ref='workflow://WF-...'`. `soloos workflows run-step WF-...` claims the oldest pending step, marks it `running`, calls the `AgentRunner` seam (`DeterministicAgentRunner` by default until live LLM runners are enabled), writes the returned Markdown draft to `data/workspace/content/WF-.../WS-....md`, stores `output_ref='file://...'` plus a short `output_text` summary, marks the step `success`, and emits a `workflow_step_run` audit event (`id='STEP-WS-...'`, `target='workflow:WF-...:step:WS-...'`, `extras.runner=<runner>`). If step execution raises, the step is marked `failed`, `output_ref='workflow-output://WF-.../WS-.../failed'`, an audit event with `status='failed'` is emitted, and the parent workflow becomes `failed`. `soloos workflows retry-step WF-... WS-...` resets a failed step to `pending`, clears `completed_at`/outputs, sets the parent workflow back to `pending`, and emits `workflow_step_retry`. The workflow becomes `success` only when no pending/running steps remain.
+
+### 2.5 approvals
 (see `M1_COMMAND_DECK.md` §4 — canonical definition)
 
-### 2.5 audit_events (index over JSONL)
+### 2.6 audit_events (index over JSONL)
 ```sql
 CREATE TABLE audit_events (
   id TEXT PRIMARY KEY,
@@ -106,6 +143,22 @@ CREATE TABLE audit_events (
 );
 CREATE INDEX idx_audit_ts ON audit_events(ts);
 ```
+
+**Integrity note:** `data/audit/*.jsonl` is the source of truth. `audit_events` is a rebuildable SQLite index; if an index write fails after JSONL append, run `soloos audit reindex`. Use `soloos audit show <event_id>` to read the full JSONL record, including `extras` such as workflow output refs.
+
+### 2.7 id_counters (internal sequence allocator)
+```sql
+CREATE TABLE id_counters (
+  prefix TEXT PRIMARY KEY,      -- e.g. 'A', 'AP', 'C', 'D'
+  next_value INTEGER NOT NULL DEFAULT 1
+);
+```
+
+`soloos.ids.next_id()` updates this table inside `BEGIN IMMEDIATE` to avoid duplicate IDs under concurrent processes. It is created lazily by the ID service because it is internal infrastructure, not a domain entity.
+
+### 2.8 Command Deck reserved tables
+
+`sessions` and `intents` are created by the initial migration for M1 Command Deck. They are used by `soloos.command_deck.CommandDeck.handle_text()` to persist chat routing state and the deterministic classifier history for the current CLI smoke path; Telegram/Discord gateway handlers will reuse the same tables.
 
 ---
 

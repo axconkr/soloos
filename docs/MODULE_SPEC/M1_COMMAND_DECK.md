@@ -32,8 +32,17 @@
 
 ### 2.3 Downstream (Command Deck → 다른 모듈)
 ```
-CommandDeck.dispatch(intent) → M2.AgentRoster.get(agent_id)
-                            → M3.Workflow.enqueue(task)
+CommandDeck.dispatch(intent) → actions row (status=pending)
+                            → M2.AgentRoster.get(agent_id)
+                            → ActionsService.run_one() (pending→running→success/failed)
+                            → M3.Workflow.create_content_plan()
+                            → workflows + workflow_steps rows
+                            → WorkflowService.run_next_step() (step pending→running→success/failed)
+                            → AgentRunner.draft_content() (deterministic fallback today)
+                            → data/workspace/content/WF-*/WS-*.md draft artifacts
+                            → workflow_step_run audit event
+                            → workflow success when all steps complete, failed on step failure
+                            → WorkflowService.retry_step() (failed→pending + workflow_step_retry)
 CommandDeck.brief()          → M6.Ledger.summary_for(day|week)
 CommandDeck.recall(query)    → M4.Memory.search(query)
 ```
@@ -59,7 +68,7 @@ CommandDeck.recall(query)    → M4.Memory.search(query)
 | `/deck use=<model> <text>` | 특정 모델 강제 (예: `use=opus`) |
 | `/deck pause <agent>` | 특정 에이전트 일시 중지 |
 | `/deck resume <agent>` | 재개 |
-| `/deck audit <id>` | 감사 로그 조회 |
+| `/deck audit <id>` | 감사 로그 상세 조회 (`soloos audit show <id>`와 동일한 full JSONL record 지향) |
 
 ---
 
@@ -82,7 +91,8 @@ CREATE TABLE approvals (
   decided_at INTEGER,
   decided_by TEXT,                    -- 'ceo' or 'auto'
   comment TEXT,
-  audit_id TEXT                       -- link to audit log
+  audit_id TEXT,                      -- link to audit log
+  params_json TEXT                    -- request payload snapshot
 );
 CREATE INDEX idx_approvals_status ON approvals(status);
 CREATE INDEX idx_approvals_created ON approvals(created_at);
@@ -113,7 +123,9 @@ CREATE TABLE intents (
 
 ## 5. Intent Classifier
 
-**Tier:** Reasoning (Claude Sonnet 4)  
+**Current Week-1 implementation:** deterministic local classifier in `soloos.command_deck.classify()` for smoke-path reliability before LLM credentials are required. It handles greeting, status, approval queue, content/CMO, sales, finance, and unknown clarification. Routed agent tasks are inserted into `actions` with `status='pending'`; `soloos agents seed` creates the active CMO/Sales/Finance/Ops roster; `soloos.actions.ActionsService.run_one()` claims one action, resolves the active agent, creates a `content_plan` workflow with ordered `draft_content` steps for CMO content requests, stores `snapshot_ref=workflow://WF-...`, and records `success`/`failed`. `soloos workflows run-step WF-...` executes each pending step with a deterministic safe stub and closes the workflow when every step is successful.
+
+**Target tier:** Reasoning (Claude Sonnet 4)  
 **Prompt strategy:** Few-shot, 15 canonical examples, structured output (JSON).
 
 ```json

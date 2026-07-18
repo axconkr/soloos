@@ -1,0 +1,1479 @@
+{
+  "generated_at": 1784206820,
+  "db_path": "soloos.sqlite",
+  "counts": {
+    "agents": 7,
+    "agent_templates": 5,
+    "agent_instances": 5,
+    "actions": 8,
+    "workflows": 1,
+    "workflow_steps": 1,
+    "approvals": 11,
+    "audit_events": 46
+  },
+  "agents": [
+    {
+      "id": "agent:ceo_office",
+      "name": "CEO Office / Chief of Staff",
+      "mission": "Translate Phillip's intent into priorities, decision gates, and daily operating briefs.",
+      "tier": "reasoning",
+      "tone": "blunt, CEO-readable, evidence-first",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_request_clarification": true,
+        "can_set_priorities": false,
+        "requires_approval_for_strategy": true
+      },
+      "kpi": {
+        "primary": "decision_latency",
+        "secondary": "weekly_execution_throughput"
+      },
+      "skills": [
+        "product_discovery",
+        "planning",
+        "decision_briefs",
+        "mission_control"
+      ]
+    },
+    {
+      "id": "agent:cfo",
+      "name": "Finance / CFO",
+      "mission": "Track cash, costs, invoices, and financial risk without making final tax or investment judgments.",
+      "tier": "reasoning",
+      "tone": "conservative, exact, risk-aware",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_file_taxes": false,
+        "can_move_money": false,
+        "requires_approval_for_money": true
+      },
+      "kpi": {
+        "primary": "cash_visibility",
+        "secondary": "cost_control"
+      },
+      "skills": [
+        "cashflow",
+        "invoices",
+        "cost_review",
+        "finance_checklists"
+      ]
+    },
+    {
+      "id": "agent:cto",
+      "name": "Engineering / CTO",
+      "mission": "Ship verified software changes for SoloOS, ax-con.com, soloforge.me, and client systems.",
+      "tier": "reasoning",
+      "tone": "technical, test-driven, concise",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_create_local_files": true,
+        "can_deploy_production": false,
+        "can_write_code": true,
+        "requires_approval_for_public_repo_or_prod": true
+      },
+      "kpi": {
+        "primary": "verified_shipments",
+        "secondary": "regression_rate"
+      },
+      "skills": [
+        "superpowers",
+        "context7",
+        "webapp_testing",
+        "tdd",
+        "github_workflow"
+      ]
+    },
+    {
+      "id": "agent:design",
+      "name": "Design / Brand",
+      "mission": "Turn strategy and product intent into usable interfaces, brand systems, and visual artifacts.",
+      "tier": "reasoning",
+      "tone": "tasteful, concrete, conversion-aware",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_change_public_brand": false,
+        "can_generate_designs": true,
+        "requires_approval_for_brand_lock": true
+      },
+      "kpi": {
+        "primary": "approved_design_assets",
+        "secondary": "ux_defect_rate"
+      },
+      "skills": [
+        "ui_ux_pro_max",
+        "taste",
+        "brand_guidelines",
+        "web_artifacts"
+      ]
+    },
+    {
+      "id": "agent:general_counsel",
+      "name": "Legal / Compliance",
+      "mission": "Flag legal, contract, privacy, and compliance risks for human review.",
+      "tier": "reasoning",
+      "tone": "careful, non-lawyer, risk-focused",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_provide_final_legal_advice": false,
+        "can_review_contracts": true,
+        "requires_human_legal_review": true
+      },
+      "kpi": {
+        "primary": "risk_flags_caught",
+        "secondary": "review_turnaround"
+      },
+      "skills": [
+        "contract_review",
+        "nda_checklist",
+        "privacy_checklist",
+        "compliance_triage"
+      ]
+    },
+    {
+      "id": "agent:growth",
+      "name": "Growth / Marketing",
+      "mission": "Create positioning, content, campaigns, and social assets for Phillip's offers.",
+      "tier": "reasoning",
+      "tone": "sharp, practical, market-aware",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_draft_public_content": true,
+        "can_publish": false,
+        "requires_approval_for_external_send": true
+      },
+      "kpi": {
+        "primary": "qualified_leads",
+        "secondary": "content_velocity"
+      },
+      "skills": [
+        "copywriting",
+        "seo",
+        "lead_magnets",
+        "campaigns",
+        "social_media"
+      ]
+    },
+    {
+      "id": "agent:ops",
+      "name": "Ops / Automation",
+      "mission": "Keep workflows, automations, Google Workspace, notifications, and delivery operations moving.",
+      "tier": "bulk",
+      "tone": "systematic, operational, terse",
+      "status": "active",
+      "updated_at": 1784183319,
+      "authority": {
+        "can_change_production": false,
+        "can_run_local_automation": true,
+        "requires_approval_for_prod": true
+      },
+      "kpi": {
+        "primary": "cycle_time",
+        "secondary": "automation_reliability"
+      },
+      "skills": [
+        "workflow",
+        "automation",
+        "google_workspace",
+        "telegram",
+        "cron",
+        "reporting"
+      ]
+    }
+  ],
+  "agent_templates": [
+    {
+      "id": "web-ops-duplicate-recovery-smoke-nfoa4b",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201782,
+      "updated_at": 1784201782,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-duplicate-recovery-smoke",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201480,
+      "updated_at": 1784201781,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-duplicate-recovery-smoke-nfo7wl",
+      "name": "중복 slug 회복 테스트 에이전트",
+      "department_agent_id": "agent:ops",
+      "mission_template": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784201779,
+      "updated_at": 1784201779,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-api-prod-smoke-1784200381",
+      "name": "API Prod Smoke Agent",
+      "department_agent_id": "agent:ops",
+      "mission_template": "API production smoke test agent draft creation for verification only. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784200382,
+      "updated_at": 1784200382,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "api_prod_smoke_pass",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    },
+    {
+      "id": "web-ops-api-smoke-1784199788",
+      "name": "API Smoke Agent",
+      "department_agent_id": "agent:ops",
+      "mission_template": "API smoke test agent draft creation for verification only. {{objective}}",
+      "risk_tier": "LOW",
+      "status": "active",
+      "created_at": 1784199789,
+      "updated_at": 1784199789,
+      "default_authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "default_kpi": {
+        "primary": "api_smoke_pass",
+        "review_required": true
+      },
+      "default_skills": [
+        "smoke_test"
+      ]
+    }
+  ],
+  "agent_instances": [
+    {
+      "id": "agent_instance:duplicate-recovery-smoke-nfoa4b",
+      "agent_id": "agent:generated:duplicate-recovery-smoke-nfoa4b",
+      "template_id": "web-ops-duplicate-recovery-smoke-nfoa4b",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke-nfoa4b",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke-nfoa4b",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201783,
+      "activated_at": null,
+      "updated_at": 1784201783,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke-nfoa4b"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:duplicate-recovery-smoke-nfo7wl",
+      "agent_id": "agent:generated:duplicate-recovery-smoke-nfo7wl",
+      "template_id": "web-ops-duplicate-recovery-smoke-nfo7wl",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke-nfo7wl",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke-nfo7wl",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201780,
+      "activated_at": null,
+      "updated_at": 1784201780,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke-nfo7wl"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:duplicate-recovery-smoke",
+      "agent_id": "agent:generated:duplicate-recovery-smoke",
+      "template_id": "web-ops-duplicate-recovery-smoke",
+      "owner_agent_id": "agent:ops",
+      "slug": "duplicate-recovery-smoke",
+      "name": "중복 slug 회복 테스트 에이전트 / duplicate-recovery-smoke",
+      "mission": "동일 slug 재제출 시에도 draft 생성이 502로 실패하지 않는지 검증합니다. 중복 slug 회복 테스트 에이전트",
+      "risk_tier": "LOW",
+      "lifecycle_status": "draft",
+      "policy_status": "review_required",
+      "approval_id": null,
+      "created_by": "employee:web-smoke",
+      "created_at": 1784201481,
+      "activated_at": null,
+      "updated_at": 1784201481,
+      "mission_vars": {
+        "objective": "중복 slug 회복 테스트 에이전트"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-duplicate-recovery-smoke"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "CEO 승인 전 외부 실행 금지",
+        "production": false
+      },
+      "kpi": {
+        "primary": "duplicate_recovery",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:api-prod-smoke-1784200381",
+      "agent_id": "agent:generated:api-prod-smoke-1784200381",
+      "template_id": "web-ops-api-prod-smoke-1784200381",
+      "owner_agent_id": "agent:ops",
+      "slug": "api-prod-smoke-1784200381",
+      "name": "API Prod Smoke Agent / api-prod-smoke-1784200381",
+      "mission": "API production smoke test agent draft creation for verification only. API Prod Smoke Agent",
+      "risk_tier": "LOW",
+      "lifecycle_status": "review",
+      "policy_status": "approval_required",
+      "approval_id": "AP-0011",
+      "created_by": "employee:web-smoke",
+      "created_at": 1784200382,
+      "activated_at": null,
+      "updated_at": 1784200384,
+      "mission_vars": {
+        "objective": "API Prod Smoke Agent"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-api-prod-smoke-1784200381"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "kpi": {
+        "primary": "api_prod_smoke_pass",
+        "review_required": true
+      }
+    },
+    {
+      "id": "agent_instance:api-smoke-1784199788",
+      "agent_id": "agent:generated:api-smoke-1784199788",
+      "template_id": "web-ops-api-smoke-1784199788",
+      "owner_agent_id": "agent:ops",
+      "slug": "api-smoke-1784199788",
+      "name": "API Smoke Agent / api-smoke-1784199788",
+      "mission": "API smoke test agent draft creation for verification only. API Smoke Agent",
+      "risk_tier": "LOW",
+      "lifecycle_status": "review",
+      "policy_status": "approval_required",
+      "approval_id": "AP-0010",
+      "created_by": "employee:web-smoke",
+      "created_at": 1784199790,
+      "activated_at": null,
+      "updated_at": 1784199800,
+      "mission_vars": {
+        "objective": "API Smoke Agent"
+      },
+      "capability_set": {
+        "owner_agent_id": "agent:ops",
+        "skills": [
+          "smoke_test"
+        ],
+        "source_template": "web-ops-api-smoke-1784199788"
+      },
+      "authority": {
+        "external_contact": false,
+        "guardrail": "No external actions. Verification only.",
+        "production": false
+      },
+      "kpi": {
+        "primary": "api_smoke_pass",
+        "review_required": true
+      }
+    }
+  ],
+  "actions": [
+    {
+      "id": "A-0030",
+      "ts": 1784181830,
+      "actor": "agent:growth",
+      "action_type": "sales_task",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784181830,
+      "completed_at": null,
+      "params": {
+        "type": "reply_draft"
+      }
+    },
+    {
+      "id": "A-0028",
+      "ts": 1784172979,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172979,
+      "completed_at": null,
+      "params": {
+        "type": "content"
+      }
+    },
+    {
+      "id": "A-0026",
+      "ts": 1784172451,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172451,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0021",
+      "ts": 1784172019,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784172019,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0017",
+      "ts": 1784171282,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784171282,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0013",
+      "ts": 1784170972,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784170972,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0010",
+      "ts": 1784169850,
+      "actor": "agent:growth",
+      "action_type": "content_plan",
+      "target": "command_deck:web:ceo:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "pending",
+      "cost_krw": 0,
+      "latency_ms": null,
+      "snapshot_ref": null,
+      "created_at": 1784169850,
+      "completed_at": null,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    },
+    {
+      "id": "A-0007",
+      "ts": 1783057929,
+      "actor": "agent:cmo",
+      "action_type": "content_plan",
+      "target": "command_deck:telegram:redacted:",
+      "policy_rule": "command_deck:local_classifier",
+      "status": "success",
+      "cost_krw": 0,
+      "latency_ms": 75,
+      "snapshot_ref": "workflow://WF-0001",
+      "created_at": 1783057929,
+      "completed_at": 1783057929,
+      "params": {
+        "type": "blog",
+        "period": "this_week",
+        "count": 1
+      }
+    }
+  ],
+  "workflows": [
+    {
+      "id": "WF-0001",
+      "created_at": 1783057929,
+      "updated_at": 1783057937,
+      "source_action_id": "A-0007",
+      "actor": "agent:cmo",
+      "workflow_type": "content_plan",
+      "title": "Create 1 blog draft(s) for this_week",
+      "status": "success",
+      "params": {
+        "count": 1,
+        "period": "this_week",
+        "type": "blog"
+      }
+    }
+  ],
+  "workflow_steps": [
+    {
+      "id": "WS-0001",
+      "workflow_id": "WF-0001",
+      "step_order": 1,
+      "actor": "agent:cmo",
+      "action_type": "draft_content",
+      "target": "workflow:WF-0001:step:1",
+      "status": "success",
+      "created_at": 1783057929,
+      "completed_at": 1783057937,
+      "output_ref": "file://WS-0001.md",
+      "output_text": "OpenRouter draft written: Blog draft 1 (blog)",
+      "params": {
+        "period": "this_week",
+        "source_action_id": "A-0007",
+        "title": "Blog draft 1",
+        "type": "blog"
+      }
+    }
+  ],
+  "approvals": [
+    {
+      "id": "AP-0011",
+      "created_at": 1784200384,
+      "agent_id": "ops",
+      "action_type": "agent_factory_activate",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "pending",
+      "decided_at": null,
+      "decided_by": null,
+      "comment": null,
+      "audit_id": null,
+      "params": {
+        "template_id": "web-ops-api-prod-smoke-1784200381",
+        "risk_tier": "LOW",
+        "generated_agent_id": "agent:generated:api-prod-smoke-1784200381",
+        "created_by": "employee:web-smoke",
+        "requested_by": "employee:web-smoke",
+        "env": "production"
+      }
+    },
+    {
+      "id": "AP-0010",
+      "created_at": 1784199800,
+      "agent_id": "ops",
+      "action_type": "agent_factory_activate",
+      "target": "agent_instance:api-smoke-1784199788",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "pending",
+      "decided_at": null,
+      "decided_by": null,
+      "comment": null,
+      "audit_id": null,
+      "params": {
+        "template_id": "web-ops-api-smoke-1784199788",
+        "risk_tier": "LOW",
+        "generated_agent_id": "agent:generated:api-smoke-1784199788",
+        "created_by": "employee:web-smoke",
+        "requested_by": "employee:web-smoke",
+        "env": "production"
+      }
+    },
+    {
+      "id": "AP-0009",
+      "created_at": 1784183318,
+      "agent_id": "agent:growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/browser-smoke-2",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784183328,
+      "decided_by": "ceo:web",
+      "comment": "browser smoke final",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0008",
+      "created_at": 1784183238,
+      "agent_id": "agent:growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/browser-smoke",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784183257,
+      "decided_by": "ceo:web",
+      "comment": "browser smoke after rebuild",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0007",
+      "created_at": 1784182679,
+      "agent_id": "agent:growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/smoke",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784183137,
+      "decided_by": "ceo:web",
+      "comment": "browser smoke",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0006",
+      "created_at": 1784172410,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-auth-boundary",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784172451,
+      "decided_by": "ceo:web",
+      "comment": "auth boundary browser smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0005",
+      "created_at": 1784171988,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-boundary",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784172037,
+      "decided_by": "ceo:web",
+      "comment": "service boundary browser smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0004",
+      "created_at": 1784171081,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-browser",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784171303,
+      "decided_by": "ceo:web",
+      "comment": "browser console smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0003",
+      "created_at": 1784170943,
+      "agent_id": "growth",
+      "action_type": "publish_content",
+      "target": "https://example.com/mission-control-smoke",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "LOW",
+      "policy_rule": "default",
+      "status": "approved",
+      "decided_at": 1784170972,
+      "decided_by": "ceo:web",
+      "comment": "curl smoke approve",
+      "audit_id": null,
+      "params": {}
+    },
+    {
+      "id": "AP-0002",
+      "created_at": 1782902250,
+      "agent_id": "finance",
+      "action_type": "task_create",
+      "target": "reminder",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "HIGH",
+      "policy_rule": "guardrail:two_key_5M",
+      "status": "rejected",
+      "decided_at": 1782902257,
+      "decided_by": "ceo",
+      "comment": "예산 초과",
+      "audit_id": null,
+      "params": {
+        "amount_krw": 6000000
+      }
+    },
+    {
+      "id": "AP-0001",
+      "created_at": 1782902249,
+      "agent_id": "cmo",
+      "action_type": "publish",
+      "target": "blog:hello",
+      "preview_url": null,
+      "cost_krw": 0,
+      "risk": "MED",
+      "policy_rule": "content_publish",
+      "status": "approved",
+      "decided_at": 1782902256,
+      "decided_by": "ceo",
+      "comment": "톤 OK",
+      "audit_id": null,
+      "params": {
+        "title": "AI Native Ops 3부",
+        "word_count": 1200
+      }
+    }
+  ],
+  "audit_events": [
+    {
+      "id": "A-0053",
+      "ts": 1784201783,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke-nfoa4b",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11895,
+      "content_hash": "sha256:28958214cd451c26"
+    },
+    {
+      "id": "A-0052",
+      "ts": 1784201780,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke-nfo7wl",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11440,
+      "content_hash": "sha256:218c88f5121211b6"
+    },
+    {
+      "id": "A-0051",
+      "ts": 1784201481,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:duplicate-recovery-smoke",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 11006,
+      "content_hash": "sha256:b53ee788455abcae"
+    },
+    {
+      "id": "A-0050",
+      "ts": 1784200384,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_activation_requested",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "status": "approval_required",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 10627,
+      "content_hash": "sha256:d86d1173a5f01a90"
+    },
+    {
+      "id": "A-0049",
+      "ts": 1784200384,
+      "actor": "agent:ops",
+      "action_type": "request_approval",
+      "target": "approval:AP-0011",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 10325,
+      "content_hash": "sha256:433c9b8e66bc391a"
+    },
+    {
+      "id": "A-0048",
+      "ts": 1784200382,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:api-prod-smoke-1784200381",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9888,
+      "content_hash": "sha256:1092b77699543a88"
+    },
+    {
+      "id": "A-0047",
+      "ts": 1784199800,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_activation_requested",
+      "target": "agent_instance:api-smoke-1784199788",
+      "status": "approval_required",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9519,
+      "content_hash": "sha256:b9ebf4d5a8fb2da5"
+    },
+    {
+      "id": "A-0046",
+      "ts": 1784199800,
+      "actor": "agent:ops",
+      "action_type": "request_approval",
+      "target": "approval:AP-0010",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 9222,
+      "content_hash": "sha256:7d9195f766d9b0d9"
+    },
+    {
+      "id": "A-0045",
+      "ts": 1784199790,
+      "actor": "employee:web-smoke",
+      "action_type": "agent_instance_created",
+      "target": "agent_instance:api-smoke-1784199788",
+      "status": "review_required",
+      "policy_rule": "agent_factory:create_draft",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 8800,
+      "content_hash": "sha256:27edc91884158066"
+    },
+    {
+      "id": "A-0044",
+      "ts": 1784183328,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0009",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 8527,
+      "content_hash": "sha256:2c0bc888795abbe9"
+    },
+    {
+      "id": "A-0043",
+      "ts": 1784183319,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 8198,
+      "content_hash": "sha256:ffff13dd8b89c741"
+    },
+    {
+      "id": "A-0042",
+      "ts": 1784183318,
+      "actor": "agent:agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0009",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 7892,
+      "content_hash": "sha256:4afccb9e96188c62"
+    },
+    {
+      "id": "A-0041",
+      "ts": 1784183257,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0008",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 7611,
+      "content_hash": "sha256:d2b02b05aa3fc8a3"
+    },
+    {
+      "id": "A-0040",
+      "ts": 1784183238,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 7282,
+      "content_hash": "sha256:6f569b77b9ffb822"
+    },
+    {
+      "id": "A-0039",
+      "ts": 1784183238,
+      "actor": "agent:agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0008",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 6978,
+      "content_hash": "sha256:ee465a0454ecc021"
+    },
+    {
+      "id": "A-0038",
+      "ts": 1784183137,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0007",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 6711,
+      "content_hash": "sha256:b9c2bf8d74989ce4"
+    },
+    {
+      "id": "A-0037",
+      "ts": 1784183113,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 6382,
+      "content_hash": "sha256:f7fe48134b611e55"
+    },
+    {
+      "id": "A-0036",
+      "ts": 1784182687,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 6053,
+      "content_hash": "sha256:c97802311a486e8d"
+    },
+    {
+      "id": "A-0035",
+      "ts": 1784182679,
+      "actor": "agent:agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0007",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5757,
+      "content_hash": "sha256:1b0e7d7618f0c641"
+    },
+    {
+      "id": "A-0034",
+      "ts": 1784182668,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5428,
+      "content_hash": "sha256:77210308bbdd9c46"
+    },
+    {
+      "id": "A-0033",
+      "ts": 1784182667,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 5093,
+      "content_hash": "sha256:738ae2ccb1e15019"
+    },
+    {
+      "id": "A-0032",
+      "ts": 1784182434,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "clarify",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 4764,
+      "content_hash": "sha256:d73b468c3dc98494"
+    },
+    {
+      "id": "A-0031",
+      "ts": 1784181830,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 4425,
+      "content_hash": "sha256:20428bc7ca0bea0d"
+    },
+    {
+      "id": "A-0029",
+      "ts": 1784172979,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 4083,
+      "content_hash": "sha256:d6b1464262bc5e61"
+    },
+    {
+      "id": "A-0027",
+      "ts": 1784172451,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 3741,
+      "content_hash": "sha256:d0480289ed1c2bd7"
+    },
+    {
+      "id": "A-0025",
+      "ts": 1784172451,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0006",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 3452,
+      "content_hash": "sha256:253212a7c9849e1b"
+    },
+    {
+      "id": "A-0024",
+      "ts": 1784172410,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0006",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 3138,
+      "content_hash": "sha256:97cab27fd76d4fb4"
+    },
+    {
+      "id": "A-0023",
+      "ts": 1784172037,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0005",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 2846,
+      "content_hash": "sha256:46c4863c8662fc00"
+    },
+    {
+      "id": "A-0022",
+      "ts": 1784172019,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 2504,
+      "content_hash": "sha256:9c56476a77870631"
+    },
+    {
+      "id": "A-0020",
+      "ts": 1784171989,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0005",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 2195,
+      "content_hash": "sha256:35f45cebf622f08b"
+    },
+    {
+      "id": "A-0019",
+      "ts": 1784171303,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0004",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 1912,
+      "content_hash": "sha256:c231d66591f34cf5"
+    },
+    {
+      "id": "A-0018",
+      "ts": 1784171282,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 1570,
+      "content_hash": "sha256:92d34a09687dd826"
+    },
+    {
+      "id": "A-0016",
+      "ts": 1784171081,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0004",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 1262,
+      "content_hash": "sha256:3ed1749d226b1ca5"
+    },
+    {
+      "id": "A-0015",
+      "ts": 1784170972,
+      "actor": "user:ceo:web",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0003",
+      "status": "success",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 990,
+      "content_hash": "sha256:e5868eabfcb744f8"
+    },
+    {
+      "id": "A-0014",
+      "ts": 1784170972,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 648,
+      "content_hash": "sha256:bb387f2f8ef24d2d"
+    },
+    {
+      "id": "A-0012",
+      "ts": 1784170943,
+      "actor": "agent:growth",
+      "action_type": "request_approval",
+      "target": "approval:AP-0003",
+      "status": "pending",
+      "policy_rule": "default",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 342,
+      "content_hash": "sha256:b1d946f4f6293edb"
+    },
+    {
+      "id": "A-0011",
+      "ts": 1784169850,
+      "actor": "user:web:ceo",
+      "action_type": "deck_dispatch",
+      "target": "session:web:ceo:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-16.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:82d26b1c36815c77"
+    },
+    {
+      "id": "STEP-WS-0001",
+      "ts": 1783057950,
+      "actor": "agent:cmo",
+      "action_type": "workflow_step_run",
+      "target": "workflow:WF-0001:step:WS-0001",
+      "status": "success",
+      "policy_rule": null,
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 747,
+      "content_hash": "sha256:3ab6abc63617fc21"
+    },
+    {
+      "id": "A-0009",
+      "ts": 1783057929,
+      "actor": "system:actions",
+      "action_type": "action_run",
+      "target": "action:A-0007",
+      "status": "success",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 363,
+      "content_hash": "sha256:5e606bc4004c10c8"
+    },
+    {
+      "id": "A-0008",
+      "ts": 1783057929,
+      "actor": "user:telegram:redacted",
+      "action_type": "deck_dispatch",
+      "target": "session:telegram:redacted:",
+      "status": "routed",
+      "policy_rule": "command_deck:local_classifier",
+      "cost_krw": 0,
+      "file_path": "2026-07-03.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:6c6f94c89ff90959"
+    },
+    {
+      "id": "A-0006",
+      "ts": 1782902257,
+      "actor": "user:ceo",
+      "action_type": "approval_rejected",
+      "target": "approval:AP-0002",
+      "status": "success",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 1345,
+      "content_hash": "sha256:5c6b52b975a21cac"
+    },
+    {
+      "id": "A-0005",
+      "ts": 1782902256,
+      "actor": "user:ceo",
+      "action_type": "approval_approved",
+      "target": "approval:AP-0001",
+      "status": "success",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 1081,
+      "content_hash": "sha256:f21dacfc10ac493f"
+    },
+    {
+      "id": "A-0004",
+      "ts": 1782902250,
+      "actor": "agent:finance",
+      "action_type": "request_approval",
+      "target": "approval:AP-0002",
+      "status": "pending",
+      "policy_rule": "guardrail:two_key_5M",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 793,
+      "content_hash": "sha256:0930241e84f4a1e8"
+    },
+    {
+      "id": "A-0003",
+      "ts": 1782902249,
+      "actor": "agent:ops",
+      "action_type": "delete",
+      "target": "db:prod",
+      "status": "deny",
+      "policy_rule": "no_prod_delete",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 542,
+      "content_hash": "sha256:b94ee87c2e353740"
+    },
+    {
+      "id": "A-0002",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "request_approval",
+      "target": "approval:AP-0001",
+      "status": "pending",
+      "policy_rule": "content_publish",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 262,
+      "content_hash": "sha256:c71568bdcf707f64"
+    },
+    {
+      "id": "A-0001",
+      "ts": 1782902249,
+      "actor": "agent:cmo",
+      "action_type": "draft_content",
+      "target": "blog:hello",
+      "status": "auto",
+      "policy_rule": "internal_drafts",
+      "cost_krw": 0,
+      "file_path": "2026-07-01.jsonl",
+      "line_offset": 0,
+      "content_hash": "sha256:b251343a7316b92e"
+    }
+  ]
+}
