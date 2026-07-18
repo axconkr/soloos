@@ -102,6 +102,12 @@ h1 { margin: 0; max-width: 900px; font-size: clamp(42px, 6vw, 82px); line-height
 .approval-item strong { display: block; font-size: 17px; }
 .approval-item p { margin: 4px 0 0; font-size: 14px; color: var(--muted); }
 .approval-brief { margin-top: 12px; display: grid; gap: 10px; }
+.telegram-decision-banner { display: grid; gap: 4px; margin-top: 10px; padding: 11px 12px; border: 1px solid rgba(34,211,238,.3); border-radius: 16px; background: rgba(34,211,238,.075); }
+.telegram-decision-banner span { color: #a5f3fc; font-family: "JetBrains Mono", monospace; font-size: 11px; font-weight: 800; text-transform: uppercase; }
+.telegram-decision-banner strong { font-size: 14px !important; }
+.telegram-decision-banner small { color: var(--muted); }
+.approval-actions.secondary button { border-color: rgba(34,211,238,.24); background: rgba(34,211,238,.08); }
+.approval-actions.secondary button:hover { border-color: rgba(34,211,238,.55); background: rgba(34,211,238,.16); }
 .approval-question { padding: 12px; border: 1px solid rgba(251,191,36,.24); border-radius: 16px; background: rgba(251,191,36,.075); }
 .approval-question span { display: block; color: #fde68a; font-size: 12px; font-weight: 800; margin-bottom: 4px; }
 .approval-question strong { font-size: 15px; line-height: 1.35; }

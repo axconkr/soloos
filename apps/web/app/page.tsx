@@ -128,6 +128,8 @@ type ApprovalItem = {
   decisionQuestion: string;
   impact: string;
   details: { label: string; value: string }[];
+  telegramStatus?: string;
+  waitingSince?: string;
   payloadSummary?: string;
 };
 
@@ -161,7 +163,11 @@ function approvalDetails(approval: RuntimeRow, snapshot: Snapshot | null) {
   const capabilityText = readableObject(capabilitySet);
   const env = text(params.env, "production");
   const previewUrl = text(approval.preview_url, "-");
+  const telegram = record(params.telegram);
+  const telegramStatus = text(telegram.delivery_status, "Telegram decision pending");
+  const waitingSince = formatTime(approval.created_at);
   const details = [
+    { label: "결정 화면", value: "Telegram에서 결정 대기 중" },
     { label: "승인 질문", value: approval.action_type === "agent_factory_activate" ? "이 AI 직원을 실제 운영에 활성화할까요?" : "이 작업을 실행/공개해도 될까요?" },
     { label: "대상", value: target },
     { label: "미션", value: text(matchedInstance?.mission ?? matchedTemplate?.mission_template, "요청 상세 미기록") },
@@ -178,24 +184,26 @@ function approvalDetails(approval: RuntimeRow, snapshot: Snapshot | null) {
     text(params.created_by, "") !== "-" ? `작성: ${text(params.created_by)}` : "",
     text(params.requested_by, "") !== "-" ? `요청: ${text(params.requested_by)}` : "",
   ]).join(" · ");
-  return { details, payloadSummary };
+  return { details, telegramStatus, waitingSince, payloadSummary };
 }
 
 function approvalItems(snapshot: Snapshot | null): ApprovalItem[] {
   const pendingApprovals = snapshot?.approvals?.filter((approval) => text(approval.status) === "pending") ?? [];
   if (pendingApprovals.length) {
     return pendingApprovals.slice(0, 3).map((approval) => {
-      const { details, payloadSummary } = approvalDetails(approval, snapshot);
+      const { details, telegramStatus, waitingSince, payloadSummary } = approvalDetails(approval, snapshot);
       const title = text(approval.action_type, "승인 대기 작업");
       return {
         approval_id: text(approval.id),
         title,
         department: departmentLabel(approval.agent_id),
         risk: approvalRisk(approval.risk),
-        action: `${text(approval.target, "대상 미지정")} · 대표가 승인/거절/수정 요청 결정`,
+        action: `${text(approval.target, "대상 미지정")} · Telegram decision pending`,
         decisionQuestion: title === "agent_factory_activate" ? "새 AI 직원을 켜도 되는지 판단" : "작업 실행/공개 여부 판단",
         impact: title === "agent_factory_activate" ? "승인하면 이 Agent Instance가 운영 대기에서 활성화 대상으로 전환됩니다." : "승인하면 담당 AI 부서가 다음 실행 단계로 넘어갑니다.",
         details,
+        telegramStatus,
+        waitingSince,
         payloadSummary,
       };
     });
@@ -325,21 +333,7 @@ export default function Home() {
     }
   }
 
-  async function sendApprovalDecision(item: ReturnType<typeof approvalItems>[number], decision: "approve" | "reject" | "revise") {
-    const label = decision === "approve" ? "승인" : decision === "reject" ? "반려" : "수정요청";
-    setApprovalFeedback(`${item.title} · ${label} 기록 중...`);
-    try {
-      const response = await fetch("/api/approval-decision", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: item.title, department: item.department, approval_id: item.approval_id, decision }),
-      });
-      if (!response.ok) throw new Error(`approval ${response.status}`);
-      setApprovalFeedback(`${item.title} · ${label} 결정이 Evidence Trail에 기록되었습니다`);
-    } catch (_error) {
-      setApprovalFeedback(`${item.title} · ${label} 기록 실패`);
-    }
-  }
+  const approvalDecisionApi = "/api/approval-decision"; // secondary API path for Telegram callback/webhook adapters
 
   return (
     <main className="ceo-shell">
@@ -401,6 +395,7 @@ export default function Home() {
         <article className="panel approval-inbox">
           <p className="section-label">Approval Inbox</p>
           <h2>대표 승인함</h2>
+          <span className="sr-only">{approvalDecisionApi}</span>
           <div className="approval-list">
             {approvals.map((item, index) => (
               <div className="approval-item" key={approvalKey(item, index)}>
@@ -408,6 +403,11 @@ export default function Home() {
                 <div>
                   <strong>{item.title}</strong>
                   <p>{item.department} · {item.action}</p>
+                  <div className="telegram-decision-banner" role="status">
+                    <span>{item.telegramStatus ?? "Telegram decision pending"}</span>
+                    <strong>Telegram에서 결정 대기 중</strong>
+                    <small>{item.waitingSince ? `${item.waitingSince}부터 대기` : "웹은 관제용 snapshot만 표시합니다"}</small>
+                  </div>
                   <div className="approval-brief" aria-label={`${item.title} 판단 근거`}>
                     <div className="approval-question">
                       <span>대표가 판단할 내용</span>
@@ -424,10 +424,9 @@ export default function Home() {
                     </dl>
                     {item.payloadSummary ? <p className="approval-payload">근거 payload · {item.payloadSummary}</p> : null}
                   </div>
-                  <div className="approval-actions" aria-label={`${item.title} 결정`}>
-                    <button type="button" onClick={() => sendApprovalDecision(item, "approve")}>승인</button>
-                    <button type="button" onClick={() => sendApprovalDecision(item, "reject")}>반려</button>
-                    <button type="button" onClick={() => sendApprovalDecision(item, "revise")}>수정요청</button>
+                  <div className="approval-actions secondary" aria-label={`${item.title} 보조 작업`}>
+                    <button type="button" onClick={() => setApprovalFeedback(`${item.title} · Telegram 결재카드 재전송은 CLI/API 보조 경로에서 처리하세요`)}>Telegram 결재카드 재전송</button>
+                    <button type="button" onClick={() => setApprovalFeedback(`${item.title} · 상세 로그 보기: Evidence Trail과 승인 payload를 확인하세요`)}>상세 로그 보기</button>
                   </div>
                 </div>
               </div>

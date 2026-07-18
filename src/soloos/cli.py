@@ -21,6 +21,7 @@ from .db import connect
 from .db import migrate as run_migrations
 from .mission_control import decide_approval, submit_ceo_request
 from .mission_control_snapshot import export_snapshot
+from .telegram_approvals import handle_telegram_approval_callback, send_approval_card
 from .policy import PolicyEngine
 from .workflow import WorkflowService
 
@@ -296,6 +297,30 @@ def approvals_decide(approval_id: str, verdict: str, comment: str | None, by: st
     svc = ApprovalsService()
     rec = svc.decide(approval_id, verdict, by=by, comment=comment)
     console.print(f"[green]✓[/green] {rec.id} → [bold]{rec.status}[/bold] by {rec.decided_by}")
+
+
+@approvals.command("resend-telegram-card")
+@click.argument("approval_id")
+def approvals_resend_telegram_card(approval_id: str) -> None:
+    """Resend or outbox the Telegram-first CEO approval card."""
+    rec = ApprovalsService().get(approval_id)
+    if rec is None:
+        raise click.ClickException(f"approval not found: {approval_id}")
+    result = send_approval_card(rec)
+    console.print(
+        f"approval={approval_id} telegram={result.delivery_status} "
+        f"chat={result.chat_ref} message={result.message_ref or '-'}"
+    )
+
+
+@approvals.command("telegram-callback")
+@click.argument("callback_data")
+@click.option("--by", default="ceo:telegram")
+@click.option("--snapshot-path", type=click.Path(path_type=str), default="apps/web/public/soloos-snapshot.json")
+def approvals_telegram_callback(callback_data: str, by: str, snapshot_path: str) -> None:
+    """Handle a Telegram inline approval callback payload."""
+    result = handle_telegram_approval_callback(callback_data, by=by, snapshot_path=Path(snapshot_path))
+    console.print(result.confirmation_text)
 
 
 @approvals.command("expire")
